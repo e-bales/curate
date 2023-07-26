@@ -1,0 +1,18 @@
+{
+  "root": true,
+  "env": {
+    "node": true,
+    "browser": true
+  },
+  "extends": ["eslint:recommended", "standard", "prettier"],
+  "rules": {
+    "no-console": "off",
+    "object-shorthand": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.html"],
+      "plugins": ["eslint-plugin-html"]
+    }
+  ]
+}
