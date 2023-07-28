@@ -16,6 +16,7 @@
     "install:server": "npm install --prefix server",
     "install:env": "test -f server/.env || cp server/.env.example server/.env",
     "postinstall": "npm-run-all --parallel install:*",
+    "prod:db:import": "sh database/prod-import.sh",
     "prepare": "husky install"
   },
   "devDependencies": {
