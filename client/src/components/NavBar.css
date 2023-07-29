@@ -1,0 +1,62 @@
+.nav-bar-wrap {
+  font-family: BebasNeue, sans-serif;
+  background-color: #394855;
+  padding: 1rem 0;
+  color: #f9f9f9;
+  position: relative;
+}
+
+.nav-bar {
+  max-width: 60%;
+  margin: auto;
+}
+
+.search-bar-wrap {
+  padding-left: 0;
+}
+
+::placeholder {
+  color: #d0d0d0;
+}
+
+.search-bar {
+  border-radius: 1.5rem;
+  font-family: BebasNeue, sans-serif;
+  text-indent: 1rem;
+  font-size: 1rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.col-half {
+  display: flex;
+  width: 50%;
+}
+
+.right {
+  justify-content: end;
+}
+
+.palette {
+  font-size: 2.5rem;
+}
+
+.title-text {
+  margin: 0;
+  font-size: 2.5rem;
+  padding-left: 1rem;
+}
+
+.small-text {
+  font-size: 1.5rem;
+}
+
+.bars {
+  position: absolute;
+  top: 1.5rem;
+  left: 1rem;
+  font-size: 2rem;
+}
