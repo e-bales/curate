@@ -1,10 +1,33 @@
 import { useEffect, useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 // import logo from './logo.svg';
+import art from './san-giorgio-maggiore-at-dusk.jpg';
+import art2 from './christ-with-angels.jpg';
+import artLarge from './Large-Test-img.jpg';
 import NavBar from './components/NavBar';
+import SplashPage from './pages/SplashPage';
+import Profile from './pages/Profile';
+import GrayOut from './components/GrayOut';
+import SignIn from './components/SignIn';
+import SignUp from './components/SignUp';
 // import './App.css';
 
+const images = [art, art2, artLarge];
+
 function App() {
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggingIn, setLoggingIn] = useState('');
+  const [grayOut, setGrayOut] = useState(false);
+
+  function closeModal() {
+    setGrayOut(false);
+    setLoggingIn('');
+  }
+
+  function openLogin() {
+    setGrayOut(true);
+    setLoggingIn('login');
+  }
   // const [serverData, setServerData] = useState('');
 
   // useEffect(() => {
@@ -21,7 +44,36 @@ function App() {
   // }, []);
 
   return (
-    <NavBar loggedIn={loggedIn} />
+    <>
+      {grayOut && <GrayOut onClick={() => closeModal()} />}
+      {/* {loggingIn === undefined ? '' : loggingIn === null ? <SignUp /> : loggingIn ? <SignIn /> : ''} */}
+      {loggingIn === 'login' ? (
+        <SignIn subtextOnClick={() => setLoggingIn('signup')} />
+      ) : loggingIn === 'signup' ? (
+        <SignUp subtextOnClick={() => setLoggingIn('login')} />
+      ) : loggingIn === '' ? (
+        ''
+      ) : (
+        ''
+      )}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <NavBar logInOnClick={() => openLogin()} loggedIn={loggedIn} />
+          }>
+          <Route
+            index
+            element={<SplashPage loggedIn={loggedIn} imageSet={images} />}
+          />
+          <Route path="profile" element={<Profile />} />
+        </Route>
+      </Routes>
+    </>
+
+    // <NavBar loggedIn={loggedIn} />
+    // <SplashPage loggedIn={loggedIn} imageSet={images} />
+
     // <div className="App">
     //   <NavBar />
     //   <header className="App-header">

@@ -1,0 +1,92 @@
+.bebas-font {
+  font-family: BebasNeue, sans-serif;
+}
+
+.sign-in {
+  position: absolute;
+  z-index: 2;
+  width: 30rem;
+  height: auto;
+  background-color: #f9f9f9;
+  border-radius: 1rem;
+  box-shadow: 0 2px 4px black;
+  left: 50%;
+  top: 5%;
+  transform: translate(-50%, 0%);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+
+  /* padding-left: 3rem; */
+}
+
+.login-row {
+  display: flex;
+  margin: auto;
+  width: 60%;
+}
+
+.login-title {
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
+  color: #363020;
+  font-weight: normal;
+}
+
+.login-col-full {
+  /* display: flex;
+  flex-direction: column;
+  width: 100%; */
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background-color: #e2e8f0;
+  color: #a6b0bc;
+  font-size: 1.25rem;
+  margin: 0.5rem 0;
+}
+
+.form-input:focus {
+  outline: transparent;
+  border: 1px solid #a6b0bc;
+}
+
+.form-input::placeholder {
+  color: #a6b0bc;
+  font-size: 1rem;
+  letter-spacing: 1px;
+}
+
+.line {
+  background-color: #363020;
+  width: 100%;
+  height: 2px;
+  margin: 1rem 0;
+}
+
+.login-button {
+  font-size: 1.5rem;
+  color: #f9f9f9;
+  background-color: #363020;
+  width: 100%;
+}
+
+.login-button:hover {
+  cursor: pointer;
+}
+
+.subtext {
+  display: flex;
+  justify-content: center;
+}
+
+.sign-up {
+  text-decoration: underline;
+  cursor: pointer;
+}

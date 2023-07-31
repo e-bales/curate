@@ -24,6 +24,7 @@
   font-family: BebasNeue, sans-serif;
   text-indent: 1rem;
   font-size: 1rem;
+  border-color: #f9f9f9;
 }
 
 .row {
@@ -48,6 +49,12 @@
   margin: 0;
   font-size: 2.5rem;
   padding-left: 1rem;
+  color: #f9f9f9;
+  text-decoration: none;
+}
+
+.title-text:hover {
+  cursor: pointer;
 }
 
 .small-text {
@@ -59,4 +66,8 @@
   top: 1.5rem;
   left: 1rem;
   font-size: 2rem;
+}
+
+.bars:hover {
+  cursor: pointer;
 }
