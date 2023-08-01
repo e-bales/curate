@@ -1,13 +1,47 @@
 import './SignUp.css';
+import { useState } from 'react';
 
 export default function SignIn({ subtextOnClick }) {
-  function handleSubmit(event) {
+  const [samePW, setSamePW] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
+
+  async function delay(msecs) {
+    return new Promise((resolve) => setTimeout(() => resolve(), msecs));
+  }
+
+  async function handleSubmit(event) {
     event.preventDefault();
     try {
       const formData = new FormData(event.target);
       const userData = Object.fromEntries(formData.entries());
       console.log(userData);
-    } catch (err) {}
+      if (userData.password !== userData.matchingPassword) {
+        setSamePW(false);
+      } else {
+        setSamePW(true);
+        setIsLoading(true);
+        delete userData.matchingPassword;
+        const req = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userData),
+        };
+
+        const res = await fetch('/api/auth/sign-up', req);
+        if (!res.ok) {
+          throw new Error(`fetch Error ${res.status}`);
+        }
+        await delay(1500);
+        const user = await res.json();
+        console.log('Registered: ', user);
+        setIsRegistered(true);
+      }
+    } catch (err) {
+      alert(`Error registering...`);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -15,7 +49,9 @@ export default function SignIn({ subtextOnClick }) {
       <div className="sign-in">
         <div className="content">
           <div className="login-row">
-            <h3 className="login-title bebas-font">Sign Up</h3>
+            <h3 className="sign-up-title bebas-font">
+              Sign Up - Become a Curator!
+            </h3>
           </div>
           <div className="login-row">
             <form onSubmit={handleSubmit}>
@@ -37,21 +73,35 @@ export default function SignIn({ subtextOnClick }) {
                 />
                 <input
                   required
-                  name="password-2"
+                  name="matchingPassword"
                   type="password"
-                  className="form-input"
+                  className={`form-input ${!samePW ? 'error-input' : ''}`}
                   placeholder="Confirm Password"
                 />
+                {!samePW && (
+                  <p className="error">
+                    Passwords do not match...please try again.
+                  </p>
+                )}
                 <div className="line"></div>
                 <div className="button-wrap">
-                  <button className="login-button bebas-font">Login</button>
+                  <button
+                    disabled={isLoading}
+                    className="login-button bebas-font">
+                    {!isLoading ? 'Sign Up' : 'Loading...'}
+                  </button>
                 </div>
               </div>
             </form>
           </div>
           <div className="subtext-wrap">
             <div className="subtext login-row bebas-font">
-              <p>Already have an account?&nbsp;</p>
+              <p className={isRegistered ? 'registered' : ''}>
+                {isRegistered
+                  ? 'Successfully registered! Proceed to:'
+                  : 'Already have an account?'}
+                &nbsp;
+              </p>
               <p onClick={() => subtextOnClick()} className="sign-up">
                 Login
               </p>

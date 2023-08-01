@@ -28,8 +28,8 @@
   width: 60%;
 }
 
-.login-title {
-  font-size: 2rem;
+.sign-up-title {
+  font-size: 1.75rem;
   margin-bottom: 0.25rem;
   color: #363020;
   font-weight: normal;
@@ -75,6 +75,7 @@
   color: #f9f9f9;
   background-color: #363020;
   width: 100%;
+  border-radius: 0.5rem;
 }
 
 .login-button:hover {
@@ -89,4 +90,17 @@
 .sign-up {
   text-decoration: underline;
   cursor: pointer;
+}
+
+.error {
+  font-size: 0.75rem;
+  color: red;
+}
+
+.error-input {
+  border: 2px solid red;
+}
+
+.registered {
+  color: green;
 }

@@ -1,13 +1,38 @@
 import './SignIn.css';
+import { useState } from 'react';
 
-export default function SignIn({ subtextOnClick }) {
-  function handleSubmit(event) {
+export default function SignIn({ subtextOnClick, onSignIn }) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function delay(msecs) {
+    return new Promise((resolve) => setTimeout(() => resolve(), msecs));
+  }
+
+  async function handleSubmit(event) {
     event.preventDefault();
     try {
+      setIsLoading(true);
       const formData = new FormData(event.target);
       const userData = Object.fromEntries(formData.entries());
-      console.log(userData);
-    } catch (err) {}
+      const req = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      };
+      const res = await fetch('/api/auth/sign-in', req);
+      if (!res.ok) {
+        throw new Error(`fetch Error ${res.status}`);
+      }
+      const { user, token } = await res.json();
+      sessionStorage.setItem('token', token);
+      console.log('Signed in: ', user);
+      delay(1500);
+      onSignIn();
+    } catch (err) {
+      alert(`Error signing in: ${err}`);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -37,7 +62,11 @@ export default function SignIn({ subtextOnClick }) {
                 />
                 <div className="line"></div>
                 <div className="button-wrap">
-                  <button className="login-button bebas-font">Login</button>
+                  <button
+                    disabled={isLoading}
+                    className="login-button bebas-font">
+                    {isLoading ? 'Loading...' : 'Login'}
+                  </button>
                 </div>
               </div>
             </form>

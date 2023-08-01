@@ -53,10 +53,6 @@
   text-decoration: none;
 }
 
-.title-text:hover {
-  cursor: pointer;
-}
-
 .small-text {
   font-size: 1.5rem;
 }
@@ -68,6 +64,47 @@
   font-size: 2rem;
 }
 
-.bars:hover {
+.drawer {
+  position: absolute;
+  z-index: 2;
+  background-color: #f9f9f9;
+  width: 15rem;
+  box-shadow: 0 6px 4px gray;
+  transition: transform 0.2s ease-in-out;
+}
+
+.drawer-content {
+  width: 80%;
+  margin: auto;
+}
+
+.drawer-links {
+  display: flex;
+  flex-direction: column;
+}
+
+.link {
+  text-decoration: none;
+  color: #394855;
+  margin: 0.25rem 0;
+}
+
+.link:hover {
+  font-weight: bold;
+}
+
+.close:hover {
+  font-weight: bold;
+}
+
+.hidden {
+  transform: translateX(-283px);
+}
+
+.shown {
+  transform: translateX(0);
+}
+
+.hover-pointer:hover {
   cursor: pointer;
 }

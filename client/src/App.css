@@ -1,0 +1,11 @@
+.app {
+  background-color: #f9f9f9;
+}
+
+html,
+body,
+#root,
+.app,
+.drawer {
+  height: 100%;
+}

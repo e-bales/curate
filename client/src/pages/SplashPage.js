@@ -45,7 +45,7 @@ export default function SplashPage({ loggedIn, imageSet }) {
 
 function SplashHeart({ onClick }) {
   return (
-    <div className="heart-wrap">
+    <div className="heart-wrap hover-pointer">
       <BsHeart className="heart" />
     </div>
   );

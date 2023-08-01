@@ -10,7 +10,7 @@ import Profile from './pages/Profile';
 import GrayOut from './components/GrayOut';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
-// import './App.css';
+import './App.css';
 
 const images = [art, art2, artLarge];
 
@@ -28,6 +28,12 @@ function App() {
     setGrayOut(true);
     setLoggingIn('login');
   }
+
+  function signedIn() {
+    setLoggingIn('');
+    setLoggedIn(true);
+    setGrayOut(false);
+  }
   // const [serverData, setServerData] = useState('');
 
   // useEffect(() => {
@@ -44,11 +50,14 @@ function App() {
   // }, []);
 
   return (
-    <>
+    <div className="app">
       {grayOut && <GrayOut onClick={() => closeModal()} />}
       {/* {loggingIn === undefined ? '' : loggingIn === null ? <SignUp /> : loggingIn ? <SignIn /> : ''} */}
       {loggingIn === 'login' ? (
-        <SignIn subtextOnClick={() => setLoggingIn('signup')} />
+        <SignIn
+          subtextOnClick={() => setLoggingIn('signup')}
+          onSignIn={() => signedIn()}
+        />
       ) : loggingIn === 'signup' ? (
         <SignUp subtextOnClick={() => setLoggingIn('login')} />
       ) : loggingIn === '' ? (
@@ -69,7 +78,7 @@ function App() {
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
-    </>
+    </div>
 
     // <NavBar loggedIn={loggedIn} />
     // <SplashPage loggedIn={loggedIn} imageSet={images} />
