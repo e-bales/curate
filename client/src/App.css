@@ -1,11 +1,24 @@
-.app {
+/* .app {
+  height: 100%;
+} */
+
+html {
+  height: 100%;
   background-color: #f9f9f9;
 }
+
+/* body {
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+} */
 
 html,
 body,
 #root,
 .app,
 .drawer {
-  height: 100%;
+  /* height: 100%; */
 }

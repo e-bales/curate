@@ -1,0 +1,40 @@
+.department-wrap {
+  max-width: 70%;
+  margin: auto;
+  background-color: #f9f9f9;
+}
+
+.department-row {
+  display: flex;
+  width: 100%;
+}
+
+.department-col-half {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.title-wrap > h1 {
+  padding-top: 2rem;
+  color: #8f7682;
+  padding-left: 2rem;
+}
+
+.department-title {
+  font-size: 1.5rem;
+  color: #394855;
+}
+
+.department-title:hover {
+  text-decoration: underline;
+}
+
+.department-link {
+  text-decoration: none;
+}
+
+/* .left-col {
+  border-left: 2px solid #394855;
+  padding-left: 2rem;
+} */

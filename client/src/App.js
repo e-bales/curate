@@ -7,6 +7,8 @@ import artLarge from './Large-Test-img.jpg';
 import NavBar from './components/NavBar';
 import SplashPage from './pages/SplashPage';
 import Profile from './pages/Profile';
+import Department from './pages/Department';
+import MultiDisplay from './pages/MultiDisplay';
 import GrayOut from './components/GrayOut';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
@@ -76,6 +78,8 @@ function App() {
             element={<SplashPage loggedIn={loggedIn} imageSet={images} />}
           />
           <Route path="profile" element={<Profile />} />
+          <Route path="department" element={<Department />} />
+          <Route path="department/:departmentId" element={<MultiDisplay />} />
         </Route>
       </Routes>
     </div>

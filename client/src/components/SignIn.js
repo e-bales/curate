@@ -25,7 +25,6 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
       }
       const { user, token } = await res.json();
       sessionStorage.setItem('token', token);
-      console.log('Signed in: ', user);
       delay(1500);
       onSignIn();
     } catch (err) {
