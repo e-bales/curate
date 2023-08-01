@@ -1,30 +1,95 @@
 import { useEffect, useState } from 'react';
-import logo from './logo.svg';
+import { Routes, Route } from 'react-router-dom';
+// import logo from './logo.svg';
+import art from './san-giorgio-maggiore-at-dusk.jpg';
+import art2 from './christ-with-angels.jpg';
+import artLarge from './Large-Test-img.jpg';
+import NavBar from './components/NavBar';
+import SplashPage from './pages/SplashPage';
+import Profile from './pages/Profile';
+import GrayOut from './components/GrayOut';
+import SignIn from './components/SignIn';
+import SignUp from './components/SignUp';
 import './App.css';
 
+const images = [art, art2, artLarge];
+
 function App() {
-  const [serverData, setServerData] = useState('');
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggingIn, setLoggingIn] = useState('');
+  const [grayOut, setGrayOut] = useState(false);
 
-  useEffect(() => {
-    async function readServerData() {
-      const resp = await fetch('/api/hello');
-      const data = await resp.json();
+  function closeModal() {
+    setGrayOut(false);
+    setLoggingIn('');
+  }
 
-      console.log('Data from server:', data);
+  function openLogin() {
+    setGrayOut(true);
+    setLoggingIn('login');
+  }
 
-      setServerData(data.message);
-    }
+  function signedIn() {
+    setLoggingIn('');
+    setLoggedIn(true);
+    setGrayOut(false);
+  }
+  // const [serverData, setServerData] = useState('');
 
-    readServerData();
-  }, []);
+  // useEffect(() => {
+  //   async function readServerData() {
+  //     const resp = await fetch('/api/hello');
+  //     const data = await resp.json();
+
+  //     console.log('Data from server:', data);
+
+  //     setServerData(data.message);
+  //   }
+
+  //   readServerData();
+  // }, []);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <h1>{serverData}</h1>
-      </header>
+    <div className="app">
+      {grayOut && <GrayOut onClick={() => closeModal()} />}
+      {/* {loggingIn === undefined ? '' : loggingIn === null ? <SignUp /> : loggingIn ? <SignIn /> : ''} */}
+      {loggingIn === 'login' ? (
+        <SignIn
+          subtextOnClick={() => setLoggingIn('signup')}
+          onSignIn={() => signedIn()}
+        />
+      ) : loggingIn === 'signup' ? (
+        <SignUp subtextOnClick={() => setLoggingIn('login')} />
+      ) : loggingIn === '' ? (
+        ''
+      ) : (
+        ''
+      )}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <NavBar logInOnClick={() => openLogin()} loggedIn={loggedIn} />
+          }>
+          <Route
+            index
+            element={<SplashPage loggedIn={loggedIn} imageSet={images} />}
+          />
+          <Route path="profile" element={<Profile />} />
+        </Route>
+      </Routes>
     </div>
+
+    // <NavBar loggedIn={loggedIn} />
+    // <SplashPage loggedIn={loggedIn} imageSet={images} />
+
+    // <div className="App">
+    //   <NavBar />
+    //   <header className="App-header">
+    //     <img src={logo} className="App-logo" alt="logo" />
+    //     <h1>{serverData}</h1>
+    //   </header>
+    // </div>
   );
 }
 

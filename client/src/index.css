@@ -1,8 +1,7 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -10,4 +9,20 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+@font-face {
+  font-family: BebasNeue;
+  src: local('BebasNeue-Regular'),
+    url('./fonts/BebasNeue-Regular.ttf') format(truetype);
+}
+
+@font-face {
+  font-family: Belleza;
+  src: local('Belleza-Regular'),
+    url('./fonts/Belleza-Regular.ttf') format(truetype);
+}
+
+* {
+  box-sizing: border-box;
 }
