@@ -17,7 +17,6 @@
 
 .piece-wrap {
   width: 100%;
-  position: relative;
 
   /* box-shadow: 6px 6px 4px darkgrey; */
   border-left: 4px solid #ebebeb;
@@ -44,6 +43,7 @@
   border-left: 2px solid #394855;
   margin-left: 2rem;
   padding-left: 2rem;
+  position: relative;
 
   /* margin-right: auto; */
 
@@ -99,6 +99,28 @@
 
 .heart-wrap-display {
   position: absolute;
-  right: 8rem;
-  top: 2.5rem;
+  bottom: 1rem;
+  left: 2rem;
+}
+
+.page-traversal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 2rem;
+}
+
+.traversal-button {
+  font-size: 1.5rem;
+  color: #394855;
+}
+
+.page-number {
+  padding: 0 2rem;
+  font-size: 1.25rem;
+  color: #394855;
+}
+
+.blank {
+  visibility: hidden;
 }

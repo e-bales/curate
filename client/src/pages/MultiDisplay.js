@@ -1,7 +1,7 @@
 import './MultiDisplay.css';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { BsHeart } from 'react-icons/bs';
+import { BsArrowBarLeft, BsArrowBarRight, BsHeart } from 'react-icons/bs';
 
 export default function MultiDisplay() {
   const { departmentId, pageNum } = useParams();
@@ -36,6 +36,7 @@ export default function MultiDisplay() {
     }
     setIsLoading(true);
     // storeApiData();
+    console.log('Page is: ', page);
     getFirstData();
   }, [departmentId, page]);
 
@@ -54,29 +55,43 @@ export default function MultiDisplay() {
           </div>
         ))}
       </div>
-      <div className="display-buttons">
-        <button type="button">Next Page!</button>
+      <div className="page-traversal">
+        <PageLink
+          departmentId={departmentId}
+          page={Number(page)}
+          left={true}
+          dataArray={requestedArt}
+          onClick={() => setPage(Number(page) - 1)}
+        />
+        <p className="page-number bebas-font">{page}</p>
+        <PageLink
+          departmentId={departmentId}
+          page={Number(page)}
+          left={false}
+          dataArray={requestedArt}
+          onClick={() => setPage(Number(page) + 1)}
+        />
       </div>
     </div>
   );
 }
 
-async function getArtData(id) {
-  try {
-    const req = {
-      method: 'GET',
-    };
-    console.log('Attempting to connect to server to cache...');
-    const res = await fetch(`/api/museum/${id}`, req);
-    if (!res.ok) {
-      throw new Error(`fetch Error ${res.status}`);
-    }
-    // const data = res.json();
-    // return data;
-  } catch (err) {
-    throw new Error(`Could not store department data...: ${err.message}`);
-  }
-}
+// async function getArtData(id) {
+//   try {
+//     const req = {
+//       method: 'GET',
+//     };
+//     console.log('Attempting to connect to server to cache...');
+//     const res = await fetch(`/api/museum/${id}`, req);
+//     if (!res.ok) {
+//       throw new Error(`fetch Error ${res.status}`);
+//     }
+//     // const data = res.json();
+//     // return data;
+//   } catch (err) {
+//     throw new Error(`Could not store department data...: ${err.message}`);
+//   }
+// }
 
 async function getServerData(id, page) {
   try {
@@ -93,14 +108,10 @@ async function getServerData(id, page) {
 
 function ArtDisplay(art) {
   art = art.art;
-  console.log('Creating piece for: ', art);
+  // console.log('Creating piece for: ', art);
   // console.log('Art accession year is: ', art.art.accessionYear)
   if (art.message === 'Not a valid object') {
     return;
-    // return ( <div className='art-error'>
-    //            <h2>Could not retrieve art piece...</h2>
-    //          </div>
-    // )
   }
   return (
     <div className="art-object-wrap">
@@ -146,7 +157,37 @@ function ArtDisplay(art) {
 function SplashHeart({ onClick }) {
   return (
     <div className="heart-wrap-display hover-pointer">
-      <BsHeart className="heart" />
+      <BsHeart onClick={() => onClick()} className="heart" />
     </div>
   );
+}
+
+function PageLink({ departmentId, page, left, dataArray, onClick }) {
+  let link = `/department/${departmentId}/`;
+  const length = dataArray?.length;
+  if (left) {
+    link += `${page - 1}`;
+    return (
+      <Link to={link}>
+        <BsArrowBarLeft
+          onClick={() => onClick()}
+          className={`traversal-button hover-pointer ${
+            page === 1 ? 'blank' : ''
+          }`}
+        />
+      </Link>
+    );
+  } else {
+    link += `${page + 1}`;
+    return (
+      <Link to={link}>
+        <BsArrowBarRight
+          onClick={() => onClick()}
+          className={`traversal-button hover-pointer ${
+            length < 10 ? 'blank' : ''
+          }`}
+        />
+      </Link>
+    );
+  }
 }
