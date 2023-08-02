@@ -1,15 +1,17 @@
 import './MultiDisplay.css';
+import LoadingModal from '../components/LoadingModal';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { BsArrowBarLeft, BsArrowBarRight, BsHeart } from 'react-icons/bs';
 
 export default function MultiDisplay() {
-  const { departmentId, pageNum } = useParams();
-  const [page, setPage] = useState(pageNum);
+  const { departmentId, pageNum: page } = useParams();
+  // const [page, setPage] = useState(pageNum);
   const [moreData, setMoreData] = useState(true);
   const [requestedArt, setRequestedArt] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // async function storeApiData() {
@@ -37,12 +39,10 @@ export default function MultiDisplay() {
       }
     }
     setIsLoading(true);
-    // storeApiData();
-    console.log('Page is: ', page);
     getFirstData();
   }, [departmentId, page]);
 
-  if (isLoading) return <div>Loading data...</div>;
+  if (isLoading) return <LoadingModal />;
   if (error) return <div>{error.message}</div>;
 
   return (
@@ -63,7 +63,9 @@ export default function MultiDisplay() {
           page={Number(page)}
           left={true}
           moreData={moreData}
-          onClick={() => setPage(Number(page) - 1)}
+          onClick={() =>
+            navigate(`/department/${departmentId}/${Number(page) - 1}`)
+          }
         />
         <p className="page-number bebas-font">{page}</p>
         <PageLink
@@ -71,7 +73,9 @@ export default function MultiDisplay() {
           page={Number(page)}
           left={false}
           moreData={moreData}
-          onClick={() => setPage(Number(page) + 1)}
+          onClick={() =>
+            navigate(`/department/${departmentId}/${Number(page) + 1}`)
+          }
         />
       </div>
     </div>
@@ -111,8 +115,6 @@ async function getServerData(id, page) {
 
 function ArtDisplay(art) {
   art = art.art;
-  // console.log('Creating piece for: ', art);
-  // console.log('Art accession year is: ', art.art.accessionYear)
   if (art.message === 'Not a valid object') {
     return;
   }

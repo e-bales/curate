@@ -161,9 +161,6 @@ app.get('/api/museum/:departmentId/:page', async (req, res, next) => {
     // server side pagination, returns arrays of length 10, if available.
     const url = `https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=${id}&q=painting&hasImage=true`;
     const data = await getMuseumData(url);
-    if (page === 4) {
-      console.log('retrieved data: ', data);
-    }
     const retrievedData = data.objectIDs.slice((page - 1) * 10, page * 10);
     let moreData = true;
     // console.log('Next spot = :', data.objectIDs[page * 10]);
