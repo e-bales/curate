@@ -25,9 +25,23 @@ app.use(express.static(reactStaticDir));
 app.use(express.static(uploadsStaticDir));
 app.use(express.json());
 
-app.get('/api/hello', (req, res) => {
-  res.json({ message: 'Boom POW!' });
-});
+// app.get('/api/hello', (req, res) => {
+//   res.json({ message: 'Boom POW!' });
+// });
+
+async function getMuseumData(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.log(response);
+      throw new Error('Unable to retrieve data...');
+    }
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
 
 app.post('/api/auth/sign-up', async (req, res, next) => {
   try {
@@ -107,6 +121,48 @@ app.delete('/api/auth/:userId', async (req, res, next) => {
       throw new ClientError(404, `UserId of ${deleteId} was not found.`);
     }
     res.sendStatus(204);
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * Loads all the data server side, so we don't have to re-query the api multiple times.
+ */
+// app.get('/api/museum/:departmentId', async (req, res, next) => {
+//   try {
+//     console.log('Attempting to cache data...');
+//     const id = Number(req.params.departmentId);
+//     if (!Number.isInteger(id)) {
+//       throw new ClientError(400, 'not a valid Id');
+//     }
+//     const url = `https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=${id}&q=painting&hasImage=true`;
+//     const data = await getMuseumData(url);
+//     currentDataRequest = data;
+//     console.log(`Data cached as ${currentDataRequest}`);
+//     console.log(currentDataRequest);
+//     res.sendStatus(204);
+//   } catch (err) {
+//     next(err);
+//   }
+// });
+
+/**
+ * Retrieves the data from 'currentDataRequest'
+ */
+app.get('/api/museum/:departmentId/:page', async (req, res, next) => {
+  try {
+    console.log('Attempting to pull data...');
+    const id = Number(req.params.departmentId);
+    const page = Number(req.params.page);
+    if (!Number.isInteger(page) || !Number.isInteger(id)) {
+      throw new ClientError(400, 'not a valid address');
+    }
+    // server side pagination, returns arrays of length 10, if available.
+    const url = `https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=${id}&q=painting&hasImage=true`;
+    const data = await getMuseumData(url);
+    const retrievedData = data.objectIDs.slice((page - 1) * 10, page * 10);
+    res.status(201).json(retrievedData);
   } catch (err) {
     next(err);
   }

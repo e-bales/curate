@@ -34,7 +34,6 @@ export default function SignIn({ subtextOnClick }) {
         }
         await delay(1500);
         const user = await res.json();
-        console.log('Registered: ', user);
         setIsRegistered(true);
       }
     } catch (err) {
