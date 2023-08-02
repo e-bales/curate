@@ -84,7 +84,7 @@ async function getDepartments() {
 function DepartmentLink({ department }) {
   const name = department.displayName;
   const id = department.departmentId;
-  const link = `/department/${id}`;
+  const link = `/department/${id}/1`;
   return (
     <Link to={link} className="department-link">
       <h2 className="department-title">{name}</h2>

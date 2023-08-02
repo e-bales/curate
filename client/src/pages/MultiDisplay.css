@@ -1,0 +1,104 @@
+.display-column {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+
+  /* margin: auto; */
+}
+
+.inner-display-column {
+  height: 15rem;
+  width: 20rem;
+  display: flex;
+  justify-content: center;
+}
+
+.piece-wrap {
+  width: 100%;
+  position: relative;
+
+  /* box-shadow: 6px 6px 4px darkgrey; */
+  border-left: 4px solid #ebebeb;
+  border-right: 4px solid #ebebeb;
+  padding: 1rem 2.5rem;
+}
+
+.art-object-wrap {
+  padding: 1.5rem 0;
+  width: 100%;
+}
+
+.art-row {
+  display: flex;
+  width: 100%;
+}
+
+.information-row {
+  display: flex;
+  width: 100%;
+}
+
+.information-column {
+  border-left: 2px solid #394855;
+  margin-left: 2rem;
+  padding-left: 2rem;
+
+  /* margin-right: auto; */
+
+  max-width: 55%;
+
+  /* width: 100%; */
+}
+
+.title-column {
+  display: flex;
+}
+
+.art-wrap {
+  justify-content: center;
+  display: flex;
+}
+
+.art {
+  width: 100%;
+}
+
+.art-title {
+  color: #394855;
+  font-size: 1.25rem;
+}
+
+.artist-title {
+  color: #9ba3a9;
+  font-size: 1.25rem;
+  display: flex;
+}
+
+.display-title {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 0;
+  color: #8f7682;
+}
+
+.art-date {
+  margin-left: 1rem;
+  padding-left: 1rem;
+  border-left: 1px solid #9ba3a9;
+}
+
+.belleza-font {
+  font-family: Belleza, serif;
+}
+
+.heart-column {
+  width: 5%;
+}
+
+.heart-wrap-display {
+  position: absolute;
+  right: 8rem;
+  top: 2.5rem;
+}

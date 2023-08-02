@@ -148,7 +148,7 @@ app.delete('/api/auth/:userId', async (req, res, next) => {
 // });
 
 /**
- * Retrieves the data from 'currentDataRequest'
+ * Retrieves the the 'page'th 10 art objectID's
  */
 app.get('/api/museum/:departmentId/:page', async (req, res, next) => {
   try {
@@ -162,7 +162,28 @@ app.get('/api/museum/:departmentId/:page', async (req, res, next) => {
     const url = `https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=${id}&q=painting&hasImage=true`;
     const data = await getMuseumData(url);
     const retrievedData = data.objectIDs.slice((page - 1) * 10, page * 10);
-    res.status(201).json(retrievedData);
+    // console.log('retrieved data: ', retrievedData);
+    if (retrievedData.length === 0) {
+      throw new ClientError(404, 'No art pieces found of that specification');
+    }
+    const init = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    const artData = [];
+    for (let i = 0; i < retrievedData.length; i++) {
+      const art = await fetch(
+        `https://collectionapi.metmuseum.org/public/collection/v1/objects/${retrievedData[i]}`,
+        init
+      );
+      const json = await art.json();
+      // console.log('json: ', json);
+      artData.push(json);
+    }
+    // console.log('Final objects: ', artData);
+    res.status(201).json(artData);
   } catch (err) {
     next(err);
   }

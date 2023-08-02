@@ -79,7 +79,10 @@ function App() {
           />
           <Route path="profile" element={<Profile />} />
           <Route path="department" element={<Department />} />
-          <Route path="department/:departmentId" element={<MultiDisplay />} />
+          <Route
+            path="department/:departmentId/:pageNum"
+            element={<MultiDisplay />}
+          />
         </Route>
       </Routes>
     </div>
