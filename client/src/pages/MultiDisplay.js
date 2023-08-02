@@ -6,6 +6,7 @@ import { BsArrowBarLeft, BsArrowBarRight, BsHeart } from 'react-icons/bs';
 export default function MultiDisplay() {
   const { departmentId, pageNum } = useParams();
   const [page, setPage] = useState(pageNum);
+  const [moreData, setMoreData] = useState(true);
   const [requestedArt, setRequestedArt] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
@@ -26,8 +27,9 @@ export default function MultiDisplay() {
       try {
         console.log('Requesting to retrieve first 10 data pieces...');
         const data = await getServerData(departmentId, page);
+        setMoreData(data.more);
         console.log('Retrieved art: ', data);
-        setRequestedArt(data);
+        setRequestedArt(data.data);
       } catch (err) {
         setError(err);
       } finally {
@@ -60,7 +62,7 @@ export default function MultiDisplay() {
           departmentId={departmentId}
           page={Number(page)}
           left={true}
-          dataArray={requestedArt}
+          moreData={moreData}
           onClick={() => setPage(Number(page) - 1)}
         />
         <p className="page-number bebas-font">{page}</p>
@@ -68,7 +70,7 @@ export default function MultiDisplay() {
           departmentId={departmentId}
           page={Number(page)}
           left={false}
-          dataArray={requestedArt}
+          moreData={moreData}
           onClick={() => setPage(Number(page) + 1)}
         />
       </div>
@@ -97,6 +99,7 @@ async function getServerData(id, page) {
   try {
     const res = await fetch(`/api/museum/${id}/${page}`);
     if (!res.ok) {
+      console.log('Res: ', res);
       throw new Error(`fetch Error ${res.status}`);
     }
     const data = await res.json();
@@ -162,9 +165,9 @@ function SplashHeart({ onClick }) {
   );
 }
 
-function PageLink({ departmentId, page, left, dataArray, onClick }) {
+function PageLink({ departmentId, page, left, moreData, onClick }) {
   let link = `/department/${departmentId}/`;
-  const length = dataArray?.length;
+  // const length = dataArray?.length;
   if (left) {
     link += `${page - 1}`;
     return (
@@ -184,7 +187,7 @@ function PageLink({ departmentId, page, left, dataArray, onClick }) {
         <BsArrowBarRight
           onClick={() => onClick()}
           className={`traversal-button hover-pointer ${
-            length < 10 ? 'blank' : ''
+            !moreData ? 'blank' : ''
           }`}
         />
       </Link>
