@@ -162,6 +162,11 @@ app.get('/api/museum/:departmentId/:page', async (req, res, next) => {
     const url = `https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=${id}&q=painting&hasImage=true`;
     const data = await getMuseumData(url);
     const retrievedData = data.objectIDs.slice((page - 1) * 10, page * 10);
+    let moreData = true;
+    // console.log('Next spot = :', data.objectIDs[page * 10]);
+    if (!data.objectIDs[page * 10]) {
+      moreData = false;
+    }
     // console.log('retrieved data: ', retrievedData);
     if (retrievedData.length === 0) {
       throw new ClientError(404, 'No art pieces found of that specification');
@@ -182,8 +187,12 @@ app.get('/api/museum/:departmentId/:page', async (req, res, next) => {
       // console.log('json: ', json);
       artData.push(json);
     }
+    const returningData = {
+      data: artData,
+      more: moreData,
+    };
     // console.log('Final objects: ', artData);
-    res.status(201).json(artData);
+    res.status(201).json(returningData);
   } catch (err) {
     next(err);
   }
