@@ -1,0 +1,84 @@
+import './SingleDisplay.css';
+import LoadingModal from '../components/LoadingModal';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+
+export default function SingleDisplay() {
+  const { objectId } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState();
+  const [artData, setArtData] = useState();
+
+  useEffect(() => {
+    async function getData() {
+      try {
+        console.log('Requesting to retrieve art piece...');
+        const data = await getArt(objectId);
+        console.log('Single art piece retreived as: ', data);
+        setArtData(data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    setIsLoading(true);
+    getData();
+  }, [objectId]);
+
+  if (isLoading) return <LoadingModal />;
+  if (error) return <div>{error.message}</div>;
+
+  return (
+    <div className="sg-display-wrap">
+      <div className="sg-display-row">
+        <div className="sg-display-col">
+          <div className="sg-art-display">
+            <img
+              className="sg-art"
+              src={artData.primaryImage}
+              alt={artData.title}
+            />
+          </div>
+        </div>
+        <div className="sg-display-col">
+          <div className="sg-information-display">
+            <div className="sg-title">
+              <h1>{artData.title}</h1>
+            </div>
+            <div className="sg-artist-info">
+              <div className="sg-artist">
+                <h3>{artData.artistAlphaSort}</h3>
+              </div>
+              <div className="sg-date">
+                <h3>{artData.objectDate}</h3>
+              </div>
+            </div>
+            <div className="sg-art-info">
+              <div className="sg-department">
+                <h3>{artData.department}</h3>
+              </div>
+              <div className="sg-medium">
+                <h3>{artData.medium}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+async function getArt(artId) {
+  try {
+    const res = await fetch(`/api/museum/object/${artId}`);
+    if (!res.ok) {
+      console.log('Res: ', res);
+      throw new Error(`fetch Error ${res.status}`);
+    }
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    throw new Error(`Could not RETRIEVE piece data...: ${err.message}`);
+  }
+}

@@ -12,6 +12,7 @@ export default function Department() {
     async function loadDepartments() {
       try {
         const response = await getDepartments();
+        console.log('Departments are: ', response);
         const even = response.departments.filter(
           (element, index) => index % 2 === 0
         );

@@ -9,6 +9,7 @@ import SplashPage from './pages/SplashPage';
 import Profile from './pages/Profile';
 import Department from './pages/Department';
 import MultiDisplay from './pages/MultiDisplay';
+import SingleDisplay from './pages/SingleDisplay';
 import GrayOut from './components/GrayOut';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
@@ -83,6 +84,7 @@ function App() {
             path="department/:departmentId/:pageNum"
             element={<MultiDisplay />}
           />
+          <Route path="object/:objectId" element={<SingleDisplay />} />
         </Route>
       </Routes>
     </div>

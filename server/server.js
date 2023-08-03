@@ -150,49 +150,68 @@ app.delete('/api/auth/:userId', async (req, res, next) => {
 /**
  * Retrieves the the 'page'th 10 art objectID's
  */
-app.get('/api/museum/:departmentId/:page', async (req, res, next) => {
+app.get(
+  '/api/museum/department/:departmentId/:page',
+  async (req, res, next) => {
+    try {
+      console.log('Attempting to pull multi-data...');
+      const id = Number(req.params.departmentId);
+      const page = Number(req.params.page);
+      if (!Number.isInteger(page) || !Number.isInteger(id)) {
+        throw new ClientError(400, 'not a valid address');
+      }
+      // server side pagination, returns arrays of length 10, if available.
+      const url = `https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=${id}&q=painting&hasImage=true`;
+      const data = await getMuseumData(url);
+      const retrievedData = data.objectIDs.slice((page - 1) * 10, page * 10);
+      let moreData = true;
+      // console.log('Next spot = :', data.objectIDs[page * 10]);
+      if (!data.objectIDs[page * 10]) {
+        moreData = false;
+      }
+      // console.log('retrieved data: ', retrievedData);
+      if (retrievedData.length === 0) {
+        throw new ClientError(404, 'No art pieces found of that specification');
+      }
+      const init = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+      const artData = [];
+      for (let i = 0; i < retrievedData.length; i++) {
+        const art = await fetch(
+          `https://collectionapi.metmuseum.org/public/collection/v1/objects/${retrievedData[i]}`,
+          init
+        );
+        const json = await art.json();
+        // console.log('json: ', json);
+        artData.push(json);
+      }
+      const returningData = {
+        data: artData,
+        more: moreData,
+      };
+      // console.log('Final objects: ', artData);
+      res.status(201).json(returningData);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+app.get('/api/museum/object/:objectId', async (req, res, next) => {
   try {
-    console.log('Attempting to pull data...');
-    const id = Number(req.params.departmentId);
-    const page = Number(req.params.page);
-    if (!Number.isInteger(page) || !Number.isInteger(id)) {
+    console.log('Attempting to pull single data...');
+    const id = Number(req.params.objectId);
+    if (!Number.isInteger(id)) {
       throw new ClientError(400, 'not a valid address');
     }
-    // server side pagination, returns arrays of length 10, if available.
-    const url = `https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=${id}&q=painting&hasImage=true`;
+    console.log(`Getting data for id: ${id}`);
+    const url = `https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`;
     const data = await getMuseumData(url);
-    const retrievedData = data.objectIDs.slice((page - 1) * 10, page * 10);
-    let moreData = true;
-    // console.log('Next spot = :', data.objectIDs[page * 10]);
-    if (!data.objectIDs[page * 10]) {
-      moreData = false;
-    }
-    // console.log('retrieved data: ', retrievedData);
-    if (retrievedData.length === 0) {
-      throw new ClientError(404, 'No art pieces found of that specification');
-    }
-    const init = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-    const artData = [];
-    for (let i = 0; i < retrievedData.length; i++) {
-      const art = await fetch(
-        `https://collectionapi.metmuseum.org/public/collection/v1/objects/${retrievedData[i]}`,
-        init
-      );
-      const json = await art.json();
-      // console.log('json: ', json);
-      artData.push(json);
-    }
-    const returningData = {
-      data: artData,
-      more: moreData,
-    };
-    // console.log('Final objects: ', artData);
-    res.status(201).json(returningData);
+    res.status(201).json(data);
   } catch (err) {
     next(err);
   }

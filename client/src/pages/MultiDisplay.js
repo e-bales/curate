@@ -1,5 +1,6 @@
 import './MultiDisplay.css';
 import LoadingModal from '../components/LoadingModal';
+import { departments } from '../department';
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { BsArrowBarLeft, BsArrowBarRight, BsHeart } from 'react-icons/bs';
@@ -9,7 +10,7 @@ export default function MultiDisplay() {
   // const [page, setPage] = useState(pageNum);
   const [moreData, setMoreData] = useState(true);
   const [requestedArt, setRequestedArt] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
   const navigate = useNavigate();
 
@@ -30,7 +31,6 @@ export default function MultiDisplay() {
         console.log('Requesting to retrieve first 10 data pieces...');
         const data = await getServerData(departmentId, page);
         setMoreData(data.more);
-        console.log('Retrieved art: ', data);
         setRequestedArt(data.data);
       } catch (err) {
         setError(err);
@@ -48,7 +48,9 @@ export default function MultiDisplay() {
   return (
     <div className="display-wrap">
       <div className="display-title">
-        <h1 className="title bebas-font">Display Test</h1>
+        <h1 className="title bebas-font">
+          {departments[departmentId].displayName}
+        </h1>
       </div>
       <div className="display-column">
         {requestedArt?.map((artPiece) => (
@@ -101,7 +103,7 @@ export default function MultiDisplay() {
 
 async function getServerData(id, page) {
   try {
-    const res = await fetch(`/api/museum/${id}/${page}`);
+    const res = await fetch(`/api/museum/department/${id}/${page}`);
     if (!res.ok) {
       console.log('Res: ', res);
       throw new Error(`fetch Error ${res.status}`);
@@ -115,6 +117,7 @@ async function getServerData(id, page) {
 
 function ArtDisplay(art) {
   art = art.art;
+  console.log('Creating art for: ', art);
   if (art.message === 'Not a valid object') {
     return;
   }
@@ -122,18 +125,22 @@ function ArtDisplay(art) {
     <div className="art-object-wrap">
       <div className="art-row">
         <div className="inner-display-column">
-          <div className="art-wrap">
-            <img
-              className="art"
-              src={art.primaryImageSmall}
-              alt={`Piece by ${art.artistDisplayName}`}
-            />
-          </div>
+          <Link to={`/object/${art.objectID}`} className="image-link link">
+            <div className="art-wrap">
+              <img
+                className="art"
+                src={art.primaryImageSmall}
+                alt={`Piece by ${art.artistDisplayName}`}
+              />
+            </div>
+          </Link>
         </div>
         <div className="information-column">
           <div className="information-row">
             <div className="title-column">
-              <div className="art-title belleza-font">{art.title}</div>
+              <Link to={`/object/${art.objectID}`} className="link">
+                <div className="art-title belleza-font">{art.title}</div>
+              </Link>
             </div>
             <div className="heart-column">
               <SplashHeart

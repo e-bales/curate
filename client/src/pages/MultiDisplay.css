@@ -29,6 +29,23 @@
   width: 100%;
 }
 
+.image-link {
+  height: 15rem;
+  width: 20rem;
+  display: flex;
+  justify-content: center;
+}
+
+.link {
+  text-decoration: none;
+}
+
+.link:hover {
+  font-weight: normal;
+
+  /* border-top: 2px solid #394855; */
+}
+
 .art-row {
   display: flex;
   width: 100%;
