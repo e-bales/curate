@@ -32,26 +32,55 @@ export default function SingleDisplay() {
   return (
     <div className="sg-display-wrap">
       <div className="sg-display-row">
-        <div className="sg-display-col">
+        <div className="sg-display-col column">
           <div className="sg-art-display">
-            <img
-              className="sg-art"
-              src={artData.primaryImage}
-              alt={artData.title}
-            />
+            <div className="sg-img-wrap">
+              <img
+                className="sg-art"
+                src={artData.primaryImage}
+                alt={artData.title}
+              />
+            </div>
+          </div>
+          <div className="art-subtext belleza-font">
+            <div className="subtext-row art-dimensions">
+              {artData.dimensions
+                ? artData.dimensions
+                : 'Dimensions unavailable.'}
+            </div>
+            <div className="subtext-row">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={artData.primaryImage}>
+                Raw Image
+              </a>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={artData.objectURL}>
+                More info
+              </a>
+            </div>
           </div>
         </div>
-        <div className="sg-display-col">
-          <div className="sg-information-display">
+        <div className="sg-display-col info-col">
+          <div className="sg-information-display belleza-font">
             <div className="sg-title">
               <h1>{artData.title}</h1>
             </div>
             <div className="sg-artist-info">
               <div className="sg-artist">
-                <h3>{artData.artistAlphaSort}</h3>
+                <h3>
+                  {artData.artistAlphaSort
+                    ? artData.artistAlphaSort
+                    : 'Unknown Artist'}
+                </h3>
               </div>
               <div className="sg-date">
-                <h3>{artData.objectDate}</h3>
+                <h3>
+                  {artData.objectDate ? artData.objectDate : 'Unknown date'}
+                </h3>
               </div>
             </div>
             <div className="sg-art-info">

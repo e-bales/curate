@@ -36,14 +36,12 @@
   justify-content: center;
 }
 
-.link {
+.multi-link {
   text-decoration: none;
 }
 
-.link:hover {
+.multi-link:hover {
   font-weight: normal;
-
-  /* border-top: 2px solid #394855; */
 }
 
 .art-row {

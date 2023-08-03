@@ -1,4 +1,5 @@
 import './Department.css';
+import LoadingModal from '../components/LoadingModal';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -21,6 +22,12 @@ export default function Department() {
         );
         setLeftCol(even);
         setRightCol(odd);
+        console.log('User is currently: ');
+        let user = sessionStorage.getItem('userObj');
+        user = JSON.parse(user);
+        console.dir(user);
+        // console.log(sessionStorage.getItem('userObj').user.userId);
+        // console.log(sessionStorage.getItem('userObj').user.username);
         // console.log('Evens: ', even)
         // console.log('Odds: ', odd);
         // console.log('Departments: ', response);
@@ -34,7 +41,7 @@ export default function Department() {
     loadDepartments();
   }, []);
 
-  if (isLoading) return <div>Loading data...</div>;
+  if (isLoading) return <LoadingModal />;
   if (error) return <div>{error.message}</div>;
 
   return (

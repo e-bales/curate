@@ -125,7 +125,9 @@ function ArtDisplay(art) {
     <div className="art-object-wrap">
       <div className="art-row">
         <div className="inner-display-column">
-          <Link to={`/object/${art.objectID}`} className="image-link link">
+          <Link
+            to={`/object/${art.objectID}`}
+            className="image-link multi-link">
             <div className="art-wrap">
               <img
                 className="art"
@@ -138,7 +140,7 @@ function ArtDisplay(art) {
         <div className="information-column">
           <div className="information-row">
             <div className="title-column">
-              <Link to={`/object/${art.objectID}`} className="link">
+              <Link to={`/object/${art.objectID}`} className="multi-link">
                 <div className="art-title belleza-font">{art.title}</div>
               </Link>
             </div>

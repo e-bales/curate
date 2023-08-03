@@ -24,7 +24,11 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
         throw new Error(`fetch Error ${res.status}`);
       }
       const { user, token } = await res.json();
-      sessionStorage.setItem('token', token);
+      console.log('User is: ', user);
+      console.log('token is: ', token);
+      const userObj = { user, token };
+      console.dir(userObj);
+      sessionStorage.setItem('userObj', JSON.stringify(userObj));
       delay(1500);
       onSignIn();
     } catch (err) {
