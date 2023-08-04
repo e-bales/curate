@@ -1,5 +1,6 @@
 import './MultiDisplay.css';
 import LoadingModal from '../components/LoadingModal';
+import Heart from '../components/Heart';
 import { departments } from '../department';
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
@@ -145,10 +146,14 @@ function ArtDisplay(art) {
               </Link>
             </div>
             <div className="heart-column">
-              <SplashHeart
-                onClick={() => {
-                  console.log('heart clicked!');
-                }}
+              <Heart
+                artId={art.objectID}
+                userId={
+                  JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+                }
+                userLiked={JSON.parse(
+                  sessionStorage.getItem('favorites')
+                ).includes(art.objectID)}
               />
             </div>
           </div>
@@ -168,13 +173,13 @@ function ArtDisplay(art) {
   );
 }
 
-function SplashHeart({ onClick }) {
-  return (
-    <div className="heart-wrap-display hover-pointer">
-      <BsHeart onClick={() => onClick()} className="heart" />
-    </div>
-  );
-}
+// function SplashHeart({ onClick }) {
+//   return (
+//     <div className="heart-wrap-display hover-pointer">
+//       <BsHeart onClick={() => onClick()} className="heart" />
+//     </div>
+//   );
+// }
 
 function PageLink({ departmentId, page, left, moreData, onClick }) {
   let link = `/department/${departmentId}/`;

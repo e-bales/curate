@@ -217,6 +217,86 @@ app.get('/api/museum/object/:objectId', async (req, res, next) => {
     next(err);
   }
 });
+
+app.delete(
+  '/api/favorites/delete/:userId/:objectId',
+  async (req, res, next) => {
+    try {
+      console.log('Attempting to delete favorited image...');
+      const userId = Number(req.params.userId);
+      const artId = Number(req.params.objectId);
+      const sql = `
+    delete
+      from "favorites"
+    where "userId" = $1 AND "artId" = $2
+    returning *
+    `;
+      const params = [userId, artId];
+      const result = await db.query(sql, params);
+      if (result.rowCount < 1) {
+        throw new ClientError(
+          404,
+          `Could not delete ${artId} from user ${userId}'s favorites.`
+        );
+      }
+      console.log(result);
+      res.sendStatus(204);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+app.post('/api/favorites/add/:userId/:objectId', async (req, res, next) => {
+  try {
+    console.log('Attempting to add favorited image...');
+    const userId = Number(req.params.userId);
+    const artId = Number(req.params.objectId);
+    const sql = `
+    insert into "favorites" ("userId", "artId")
+    values ($1, $2)
+    returning *
+    `;
+    const params = [userId, artId];
+    const result = await db.query(sql, params);
+    if (result.rowCount < 1) {
+      throw new ClientError(
+        404,
+        `Could not add ${artId} to user ${userId}'s favorites.`
+      );
+    }
+    res.sendStatus(204);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/api/favorites/:userId', async (req, res, next) => {
+  try {
+    const userId = Number(req.params.userId);
+    console.log(`Retrieving favorites for ${userId}`);
+    const sql = `
+    select "artId"
+      from "favorites"
+    where "userId" = $1
+    `;
+    const params = [userId];
+    const result = await db.query(sql, params);
+    const rows = result.rows;
+    if (rows.length > 0) {
+      const newRows = rows.map((element) => element.artId);
+      res.status(201).json(newRows);
+    } else {
+      res.status(201).json([]);
+    }
+
+    // console.log('Returned favorites are: ', newRows);
+
+    // res.status(201).json(result);
+  } catch (err) {
+    next(err);
+  }
+});
 /**
  * Serves React's index.html if no api route matches.
  *

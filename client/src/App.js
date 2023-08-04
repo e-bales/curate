@@ -37,6 +37,12 @@ function App() {
     setLoggedIn(true);
     setGrayOut(false);
   }
+
+  useEffect(() => {
+    if (JSON.parse(sessionStorage.getItem('userObj'))?.user !== undefined) {
+      setLoggedIn(true);
+    }
+  }, []);
   // const [serverData, setServerData] = useState('');
 
   // useEffect(() => {
