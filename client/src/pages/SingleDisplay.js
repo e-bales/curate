@@ -1,6 +1,7 @@
 import './SingleDisplay.css';
 import LoadingModal from '../components/LoadingModal';
 import { useEffect, useState } from 'react';
+import Heart from '../components/Heart';
 import { Link, useParams } from 'react-router-dom';
 
 export default function SingleDisplay() {
@@ -66,6 +67,17 @@ export default function SingleDisplay() {
         </div>
         <div className="sg-display-col info-col">
           <div className="sg-information-display belleza-font">
+            <div className="sg-heart-wrap">
+              <Heart
+                artId={artData?.objectID}
+                userId={
+                  JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+                }
+                userLiked={JSON.parse(
+                  sessionStorage.getItem('favorites')
+                ).includes(artData?.objectID)}
+              />
+            </div>
             <div className="sg-title">
               <h1>{artData.title}</h1>
             </div>

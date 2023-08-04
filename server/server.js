@@ -252,6 +252,12 @@ app.post('/api/favorites/add/:userId/:objectId', async (req, res, next) => {
     console.log('Attempting to add favorited image...');
     const userId = Number(req.params.userId);
     const artId = Number(req.params.objectId);
+    if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
+      throw new ClientError(
+        404,
+        `Could not add ${artId} to user ${userId}'s favorites.`
+      );
+    }
     const sql = `
     insert into "favorites" ("userId", "artId")
     values ($1, $2)
