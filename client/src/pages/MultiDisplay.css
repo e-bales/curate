@@ -139,3 +139,14 @@
 .blank {
   visibility: hidden;
 }
+
+.error-wrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 2rem;
+}
+
+.unauthenticated {
+  color: #8f7682;
+  font-size: 2.5rem;
+}

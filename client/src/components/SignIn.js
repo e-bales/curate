@@ -29,9 +29,10 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
       sessionStorage.setItem('favorites', JSON.stringify(favoritesJSON));
       console.log('User is: ', user);
       console.log('token is: ', token);
-      const userObj = { user, token };
+      const userObj = { user };
       console.dir(userObj);
       sessionStorage.setItem('userObj', JSON.stringify(userObj));
+      sessionStorage.setItem('token', token);
       delay(1500);
       onSignIn();
     } catch (err) {

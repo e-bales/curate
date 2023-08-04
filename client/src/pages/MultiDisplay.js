@@ -44,7 +44,18 @@ export default function MultiDisplay() {
   }, [departmentId, page]);
 
   if (isLoading) return <LoadingModal />;
-  if (error) return <div>{error.message}</div>;
+  if (error) {
+    if (error.message.split(': ')[1] === 'Please log in to access this page.') {
+      return (
+        <div className="error-wrap">
+          <div className="unauthenticated bebas-font">
+            Please log in to access this page.
+          </div>
+        </div>
+      );
+    }
+    return <div>{error.message}</div>;
+  }
 
   return (
     <div className="display-wrap">
@@ -104,14 +115,26 @@ export default function MultiDisplay() {
 
 async function getServerData(id, page) {
   try {
-    const res = await fetch(`/api/museum/department/${id}/${page}`);
+    const req = {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+      },
+    };
+    const res = await fetch(`/api/museum/department/${id}/${page}`, req);
     if (!res.ok) {
-      console.log('Res: ', res);
+      // console.log('Res: ', res);
+      // const msg = await res.json();
+      // console.log(res.status);
+      if (res.status === 401) {
+        throw new Error('Please log in to access this page.');
+      }
       throw new Error(`fetch Error ${res.status}`);
     }
     const data = await res.json();
     return data;
   } catch (err) {
+    console.log(err);
     throw new Error(`Could not RETRIEVE department data...: ${err.message}`);
   }
 }

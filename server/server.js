@@ -3,7 +3,7 @@ import argon2 from 'argon2';
 import express from 'express';
 import errorMiddleware from './lib/error-middleware.js';
 import ClientError from './lib/client-error.js';
-// import authorizationMiddleware from './lib/authorization-middleware.js';
+import authorizationMiddleware from './lib/authorization-middleware.js';
 import jwt from 'jsonwebtoken';
 import pg from 'pg';
 
@@ -153,6 +153,7 @@ app.delete('/api/auth/:userId', async (req, res, next) => {
  */
 app.get(
   '/api/museum/department/:departmentId/:page',
+  authorizationMiddleware,
   async (req, res, next) => {
     try {
       console.log('Attempting to pull multi-data...');
