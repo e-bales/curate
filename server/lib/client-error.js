@@ -1,4 +1,4 @@
-export default class ClientError extends Error {
+class ClientError extends Error {
   status;
 
   constructor(status, message) {
@@ -6,3 +6,5 @@ export default class ClientError extends Error {
     this.status = status;
   }
 }
+
+export default ClientError;

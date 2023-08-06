@@ -1,0 +1,112 @@
+.sg-art-display {
+  display: flex;
+  justify-content: center;
+  height: 30rem;
+  width: 50rem;
+}
+
+.sg-img-wrap {
+  display: flex;
+  justify-content: center;
+  height: 30rem;
+  width: 50rem;
+}
+
+.sg-art {
+  max-width: 40rem;
+}
+
+.sg-display-wrap {
+  padding-top: 2rem;
+  max-width: 80%;
+  margin: auto;
+}
+
+.sg-display-row {
+  display: flex;
+  width: 100%;
+}
+
+.sg-display-col {
+  display: flex;
+  justify-content: center;
+  width: 50%;
+}
+
+.column {
+  flex-direction: column;
+  align-items: center;
+  padding-top: 1rem;
+}
+
+.sg-information-display {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 4.5rem;
+  position: relative;
+}
+
+.sg-heart-wrap {
+  position: absolute;
+  top: 3rem;
+  left: -2rem;
+}
+
+.sg-title {
+  color: #394855;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.sg-title > h1 {
+  margin: 0.5rem 0;
+}
+
+.sg-artist-info {
+  color: #9ba3a9;
+  padding-bottom: 1rem;
+
+  /* padding-top: -1rem; */
+}
+
+.sg-artist-info h3 {
+  margin: 0.25rem 0;
+  font-size: 1.25rem;
+}
+
+.sg-art-info {
+  color: #9ba3a9;
+  font-size: 0.75rem;
+}
+
+.sg-art-info h3 {
+  margin: 0.25rem 0;
+}
+
+.info-col {
+  border-left: 2px solid #394855;
+  justify-content: left;
+  margin-left: 5rem;
+  padding-left: 4rem;
+}
+
+.art-subtext {
+  color: #9ba3a9;
+  padding-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.art-subtext a {
+  color: #9ba3a9;
+  padding: 1rem;
+}
+
+.art-dimensions {
+  padding-bottom: 0.5rem;
+  max-width: 20rem;
+  text-align: center;
+}

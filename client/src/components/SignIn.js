@@ -24,6 +24,14 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
         throw new Error(`fetch Error ${res.status}`);
       }
       const { user, token } = await res.json();
+      const favorites = await fetch(`/api/favorites/${user.userId}`);
+      const favoritesJSON = await favorites.json();
+      sessionStorage.setItem('favorites', JSON.stringify(favoritesJSON));
+      console.log('User is: ', user);
+      console.log('token is: ', token);
+      const userObj = { user };
+      console.dir(userObj);
+      sessionStorage.setItem('userObj', JSON.stringify(userObj));
       sessionStorage.setItem('token', token);
       delay(1500);
       onSignIn();

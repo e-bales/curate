@@ -29,6 +29,21 @@
   width: 100%;
 }
 
+.image-link {
+  height: 15rem;
+  width: 20rem;
+  display: flex;
+  justify-content: center;
+}
+
+.multi-link {
+  text-decoration: none;
+}
+
+.multi-link:hover {
+  font-weight: normal;
+}
+
 .art-row {
   display: flex;
   width: 100%;
@@ -123,4 +138,15 @@
 
 .blank {
   visibility: hidden;
+}
+
+.error-wrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 2rem;
+}
+
+.unauthenticated {
+  color: #8f7682;
+  font-size: 2.5rem;
 }

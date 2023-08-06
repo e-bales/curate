@@ -3,6 +3,7 @@ import argon2 from 'argon2';
 import express from 'express';
 import errorMiddleware from './lib/error-middleware.js';
 import ClientError from './lib/client-error.js';
+import authorizationMiddleware from './lib/authorization-middleware.js';
 import jwt from 'jsonwebtoken';
 import pg from 'pg';
 
@@ -150,26 +151,160 @@ app.delete('/api/auth/:userId', async (req, res, next) => {
 /**
  * Retrieves the the 'page'th 10 art objectID's
  */
-app.get('/api/museum/:departmentId/:page', async (req, res, next) => {
-  try {
-    console.log('Attempting to pull data...');
-    const id = Number(req.params.departmentId);
-    const page = Number(req.params.page);
-    if (!Number.isInteger(page) || !Number.isInteger(id)) {
-      throw new ClientError(400, 'not a valid address');
+app.get(
+  '/api/museum/department/:departmentId/:page',
+  authorizationMiddleware,
+  async (req, res, next) => {
+    try {
+      console.log('Attempting to pull multi-data...');
+      const id = Number(req.params.departmentId);
+      const page = Number(req.params.page);
+      if (!Number.isInteger(page) || !Number.isInteger(id)) {
+        throw new ClientError(400, 'not a valid address');
+      }
+      // server side pagination, returns arrays of length 10, if available.
+      const url = `https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=${id}&q=painting&hasImage=true`;
+      const data = await getMuseumData(url);
+      const retrievedData = data.objectIDs.slice((page - 1) * 10, page * 10);
+      let moreData = true;
+      // console.log('Next spot = :', data.objectIDs[page * 10]);
+      if (!data.objectIDs[page * 10]) {
+        moreData = false;
+      }
+      // console.log('retrieved data: ', retrievedData);
+      if (retrievedData.length === 0) {
+        throw new ClientError(404, 'No art pieces found of that specification');
+      }
+      const init = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+      const artData = [];
+      for (let i = 0; i < retrievedData.length; i++) {
+        const art = await fetch(
+          `https://collectionapi.metmuseum.org/public/collection/v1/objects/${retrievedData[i]}`,
+          init
+        );
+        const json = await art.json();
+        // console.log('json: ', json);
+        artData.push(json);
+      }
+      const returningData = {
+        data: artData,
+        more: moreData,
+      };
+      // console.log('Final objects: ', artData);
+      res.status(201).json(returningData);
+    } catch (err) {
+      next(err);
     }
-    // server side pagination, returns arrays of length 10, if available.
-    const url = `https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=${id}&q=painting&hasImage=true`;
-    const data = await getMuseumData(url);
-    const retrievedData = data.objectIDs.slice((page - 1) * 10, page * 10);
+  }
+);
+
+app.get(
+  '/api/museum/object/:objectId',
+  authorizationMiddleware,
+  async (req, res, next) => {
+    try {
+      console.log('Attempting to pull single data...');
+      const id = Number(req.params.objectId);
+      if (!Number.isInteger(id)) {
+        throw new ClientError(400, 'not a valid address');
+      }
+      console.log(`Getting data for id: ${id}`);
+      const url = `https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`;
+      const data = await getMuseumData(url);
+      res.status(201).json(data);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+app.delete(
+  '/api/favorites/delete/:userId/:objectId',
+  async (req, res, next) => {
+    try {
+      console.log('Attempting to delete favorited image...');
+      const userId = Number(req.params.userId);
+      const artId = Number(req.params.objectId);
+      const sql = `
+    delete
+      from "favorites"
+    where "userId" = $1 AND "artId" = $2
+    returning *
+    `;
+      const params = [userId, artId];
+      const result = await db.query(sql, params);
+      if (result.rowCount < 1) {
+        throw new ClientError(
+          404,
+          `Could not delete ${artId} from user ${userId}'s favorites.`
+        );
+      }
+      console.log(result);
+      res.sendStatus(204);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+app.post('/api/favorites/add/:userId/:objectId', async (req, res, next) => {
+  try {
+    console.log('Attempting to add favorited image...');
+    const userId = Number(req.params.userId);
+    const artId = Number(req.params.objectId);
+    if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
+      throw new ClientError(
+        404,
+        `Could not add ${artId} to user ${userId}'s favorites.`
+      );
+    }
+    const sql = `
+    insert into "favorites" ("userId", "artId")
+    values ($1, $2)
+    returning *
+    `;
+    const params = [userId, artId];
+    const result = await db.query(sql, params);
+    if (result.rowCount < 1) {
+      throw new ClientError(
+        404,
+        `Could not add ${artId} to user ${userId}'s favorites.`
+      );
+    }
+    res.sendStatus(204);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/api/favorites/:userId/:page', async (req, res, next) => {
+  try {
+    const userId = Number(req.params.userId);
+    const page = Number(req.params.page);
+    console.log(`Retrieving favorites, page: ${page}, for ${userId}`);
+    const sql = `
+    select "artId"
+      from "favorites"
+    where "userId" = $1
+    `;
+    const params = [userId];
+    const result = await db.query(sql, params);
+    const rows = result.rows;
     let moreData = true;
     // console.log('Next spot = :', data.objectIDs[page * 10]);
-    if (!data.objectIDs[page * 10]) {
+    if (!rows[page * 10]) {
       moreData = false;
     }
-    // console.log('retrieved data: ', retrievedData);
-    if (retrievedData.length === 0) {
-      throw new ClientError(404, 'No art pieces found of that specification');
+    let data = [];
+    if (rows.length > 0) {
+      const slicedRows = rows.slice((page - 1) * 10, page * 10);
+      const newRows = slicedRows.map((element) => element.artId);
+      data = newRows;
     }
     const init = {
       method: 'GET',
@@ -178,25 +313,56 @@ app.get('/api/museum/:departmentId/:page', async (req, res, next) => {
       },
     };
     const artData = [];
-    for (let i = 0; i < retrievedData.length; i++) {
+    for (let i = 0; i < data.length; i++) {
       const art = await fetch(
-        `https://collectionapi.metmuseum.org/public/collection/v1/objects/${retrievedData[i]}`,
+        `https://collectionapi.metmuseum.org/public/collection/v1/objects/${data[i]}`,
         init
       );
       const json = await art.json();
       // console.log('json: ', json);
       artData.push(json);
     }
+
     const returningData = {
       data: artData,
       more: moreData,
     };
-    // console.log('Final objects: ', artData);
+
     res.status(201).json(returningData);
   } catch (err) {
     next(err);
   }
 });
+
+app.get(
+  '/api/followers/:userId',
+  authorizationMiddleware,
+  async (req, res, next) => {
+    try {
+      const userId = Number(req.params.userId);
+      console.log(`Retrieving followers for ${userId}`);
+      const sql = `
+    select "followedUserId"
+      from "followers"
+    where "userId" = $1
+    `;
+      const params = [userId];
+      const result = await db.query(sql, params);
+      const rows = result.rows;
+      res.status(201).json(rows);
+
+      // if (rows.length > 0) {
+      //   const newRows = rows.map((element) => element.artId);
+      //   res.status(201).json(newRows);
+      // } else {
+      //   res.status(201).json([]);
+      // }
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 /**
  * Serves React's index.html if no api route matches.
  *
