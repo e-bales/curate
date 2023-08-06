@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import Department from './pages/Department';
 import MultiDisplay from './pages/MultiDisplay';
 import SingleDisplay from './pages/SingleDisplay';
+import Favorites from './pages/Favorites';
 import GrayOut from './components/GrayOut';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
@@ -85,6 +86,7 @@ function App() {
             element={<SplashPage loggedIn={loggedIn} imageSet={images} />}
           />
           <Route path="profile" element={<Profile />} />
+          <Route path="favorites/:pageNum" element={<Favorites />} />
           <Route path="department" element={<Department />} />
           <Route
             path="department/:departmentId/:pageNum"

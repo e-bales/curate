@@ -1,13 +1,12 @@
-import './MultiDisplay.css';
+import './Favorites.css';
 import LoadingModal from '../components/LoadingModal';
 import Heart from '../components/Heart';
-import { departments } from '../department';
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { BsArrowBarLeft, BsArrowBarRight, BsHeart } from 'react-icons/bs';
+import { BsArrowBarLeft, BsArrowBarRight } from 'react-icons/bs';
 
-export default function MultiDisplay() {
-  const { departmentId, pageNum: page } = useParams();
+export default function Favorites() {
+  const { pageNum: page } = useParams();
   // const [page, setPage] = useState(pageNum);
   const [moreData, setMoreData] = useState(true);
   const [requestedArt, setRequestedArt] = useState();
@@ -16,21 +15,17 @@ export default function MultiDisplay() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // async function storeApiData() {
-    //   try {
-    //     console.log('Requesting to cache data...');
-    //     await sendApiRequest(departmentId);
-    //   } catch (err) {
-    //     setError(err);
-    //   }
-    // }
     /**
      * Gets the server to retrieve the objectId's of 10 of the art pieces
      */
     async function getFirstData() {
       try {
-        console.log('Requesting to retrieve first 10 data pieces...');
-        const data = await getServerData(departmentId, page);
+        console.log('Requesting to retrieve first 10 favorites...');
+        const id = JSON.parse(sessionStorage.getItem('userObj'))?.user.userId;
+        if (!id) {
+          throw new Error(' : Please log in to access this page.');
+        }
+        const data = await getFavoritesData(id, page);
         setMoreData(data.more);
         setRequestedArt(data.data);
       } catch (err) {
@@ -41,7 +36,7 @@ export default function MultiDisplay() {
     }
     setIsLoading(true);
     getFirstData();
-  }, [departmentId, page]);
+  }, [page]);
 
   if (isLoading) return <LoadingModal />;
   if (error) {
@@ -60,9 +55,7 @@ export default function MultiDisplay() {
   return (
     <div className="display-wrap">
       <div className="display-title">
-        <h1 className="title bebas-font">
-          {departments[departmentId].displayName}
-        </h1>
+        <h1 className="title bebas-font">Your Favorites</h1>
       </div>
       <div className="display-column">
         {requestedArt?.map((artPiece) => (
@@ -72,24 +65,18 @@ export default function MultiDisplay() {
         ))}
       </div>
       <div className="page-traversal">
-        <PageLink
-          departmentId={departmentId}
+        <FavoritesLink
           page={Number(page)}
           left={true}
           moreData={moreData}
-          onClick={() =>
-            navigate(`/department/${departmentId}/${Number(page) - 1}`)
-          }
+          onClick={() => navigate(`/favorites/${Number(page) - 1}`)}
         />
         <p className="page-number bebas-font">{page}</p>
-        <PageLink
-          departmentId={departmentId}
+        <FavoritesLink
           page={Number(page)}
           left={false}
           moreData={moreData}
-          onClick={() =>
-            navigate(`/department/${departmentId}/${Number(page) + 1}`)
-          }
+          onClick={() => navigate(`/favorites/${Number(page) + 1}`)}
         />
       </div>
     </div>
@@ -113,7 +100,7 @@ export default function MultiDisplay() {
 //   }
 // }
 
-async function getServerData(id, page) {
+async function getFavoritesData(id, page) {
   try {
     const req = {
       method: 'GET',
@@ -121,7 +108,7 @@ async function getServerData(id, page) {
         Authorization: `Bearer ${sessionStorage.getItem('token')}`,
       },
     };
-    const res = await fetch(`/api/museum/department/${id}/${page}`, req);
+    const res = await fetch(`/api/favorites/${id}/${page}`, req);
     if (!res.ok) {
       // console.log('Res: ', res);
       // const msg = await res.json();
@@ -208,7 +195,7 @@ function ArtDisplay(art) {
 //   );
 // }
 
-function PageLink({ departmentId, page, left, moreData, onClick }) {
+function FavoritesLink({ page, left, moreData, onClick }) {
   // const length = dataArray?.length;
   if (left) {
     return (

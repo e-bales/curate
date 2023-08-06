@@ -28,7 +28,18 @@ export default function SingleDisplay() {
   }, [objectId]);
 
   if (isLoading) return <LoadingModal />;
-  if (error) return <div>{error.message}</div>;
+  if (error) {
+    if (error.message.split(': ')[1] === 'Please log in to access this page.') {
+      return (
+        <div className="error-wrap">
+          <div className="unauthenticated bebas-font">
+            Please log in to access this page.
+          </div>
+        </div>
+      );
+    }
+    return <div>{error.message}</div>;
+  }
 
   return (
     <div className="sg-display-wrap">
@@ -112,9 +123,18 @@ export default function SingleDisplay() {
 
 async function getArt(artId) {
   try {
-    const res = await fetch(`/api/museum/object/${artId}`);
+    const req = {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+      },
+    };
+    const res = await fetch(`/api/museum/object/${artId}`, req);
     if (!res.ok) {
-      console.log('Res: ', res);
+      // console.log('Res: ', res);
+      if (res.status === 401) {
+        throw new Error('Please log in to access this page.');
+      }
       throw new Error(`fetch Error ${res.status}`);
     }
     const data = await res.json();
