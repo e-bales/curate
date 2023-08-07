@@ -12,6 +12,7 @@ import MultiDisplay from './pages/MultiDisplay';
 import SingleDisplay from './pages/SingleDisplay';
 import Favorites from './pages/Favorites';
 import GallerySubmission from './pages/GallerySubmission';
+import Gallery from './pages/Gallery';
 import GrayOut from './components/GrayOut';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
@@ -98,6 +99,7 @@ function App() {
             element={<MultiDisplay />}
           />
           <Route path="object/:objectId" element={<SingleDisplay />} />
+          <Route path="gallery/:userId" element={<Gallery />} />
         </Route>
       </Routes>
     </div>

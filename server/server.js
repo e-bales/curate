@@ -127,6 +127,29 @@ app.delete('/api/auth/:userId', async (req, res, next) => {
   }
 });
 
+app.get('/api/db/:userId', async (req, res, next) => {
+  try {
+    const userId = Number(req.params.userId);
+    if (!Number.isInteger(userId)) {
+      throw new ClientError(404, 'Not a valid userId');
+    }
+    const sql = `
+    select "username"
+      from "users"
+    where "userId" = $1
+    `;
+    const params = [userId];
+    const result = await db.query(sql, params);
+    const [user] = result.rows;
+    if (!user) {
+      throw new ClientError(404, 'Could not find the requested user.');
+    }
+    res.status(201).json(user);
+  } catch (err) {
+    next(err);
+  }
+});
+
 /**
  * Loads all the data server side, so we don't have to re-query the api multiple times.
  */
@@ -409,6 +432,29 @@ app.post('/api/gallery/:userId/:artId', async (req, res, next) => {
       throw new ClientError(404, `${artId} not in ${userId}'s favorites.`);
     }
     res.sendStatus(204);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.get('/api/gallery/:userId', async (req, res, next) => {
+  try {
+    const userId = Number(req.params.userId);
+    if (!Number.isInteger(userId)) {
+      throw new ClientError(
+        404,
+        `Could not read user ${userId}'s gallery due to bad request params.`
+      );
+    }
+    const sql = `
+    select *
+      from "favorites"
+    where "userId" = $1 AND "description" IS NOT NULL
+    `;
+    const params = [userId];
+    const result = await db.query(sql, params);
+    const rows = result.rows;
+    res.status(201).json(rows);
   } catch (err) {
     next(err);
   }
