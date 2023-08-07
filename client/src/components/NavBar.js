@@ -38,7 +38,6 @@ export default function NavBar({ loggedIn, logInOnClick, search }) {
             {/* <p className="title-text">Curate.</p> */}
           </div>
           <div className="col-half right">
-            {loggedIn ? <SearchBar /> : ''}
             {loggedIn ? (
               <Link
                 to="/profile"

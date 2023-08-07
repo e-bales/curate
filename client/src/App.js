@@ -11,6 +11,7 @@ import Department from './pages/Department';
 import MultiDisplay from './pages/MultiDisplay';
 import SingleDisplay from './pages/SingleDisplay';
 import Favorites from './pages/Favorites';
+import GallerySubmission from './pages/GallerySubmission';
 import GrayOut from './components/GrayOut';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
@@ -87,6 +88,10 @@ function App() {
           />
           <Route path="profile" element={<Profile />} />
           <Route path="favorites/:pageNum" element={<Favorites />} />
+          <Route
+            path="gallery/submission/:objectId"
+            element={<GallerySubmission />}
+          />
           <Route path="department" element={<Department />} />
           <Route
             path="department/:departmentId/:pageNum"
