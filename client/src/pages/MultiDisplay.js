@@ -139,8 +139,8 @@ async function getServerData(id, page) {
   }
 }
 
-function ArtDisplay(art) {
-  art = art.art;
+function ArtDisplay({ art }) {
+  //art = art.art;
   console.log('Creating art for: ', art);
   if (art.message === 'Not a valid object') {
     return;

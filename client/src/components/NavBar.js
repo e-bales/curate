@@ -3,18 +3,30 @@ import { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { FaPalette, FaBars } from 'react-icons/fa';
 
-export default function NavBar({ loggedIn, logInOnClick, search }) {
+export default function NavBar({ loggedIn, logInOnClick, search, logOut }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  // const [userLoggedIn, setUserLoggedIn] = useState(loggedIn);
   const link = [
-    { name: 'Profile', link: '/profile' },
-    { name: 'View by Department', link: '/department' },
-    { name: 'View by Medium', link: '/medium' },
-    { name: 'Log Out', link: '/' },
+    { name: 'Profile', link: '/profile', onClick: closeDrawer },
+    { name: 'View by Department', link: '/department', onClick: closeDrawer },
+    { name: 'Log Out', link: '/', onClick: signOut },
   ];
 
   function closeDrawer() {
     setDrawerOpen(false);
   }
+
+  function signOut() {
+    sessionStorage.removeItem('userObj');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('favorites');
+    if (sessionStorage.getItem('editData'))
+      sessionStorage.removeItem('editData');
+    logOut();
+    // setUserLoggedIn(false);
+    closeDrawer();
+  }
+  console.log('User logged in is: ', loggedIn);
 
   return (
     <div>
@@ -22,7 +34,7 @@ export default function NavBar({ loggedIn, logInOnClick, search }) {
         viewed={drawerOpen}
         loggedIn={loggedIn}
         drawerLinks={link}
-        onClick={() => closeDrawer()}
+        // onClick={() => closeDrawer()}
       />
       <header className="nav-bar-wrap">
         <FaBars
@@ -62,17 +74,21 @@ export default function NavBar({ loggedIn, logInOnClick, search }) {
   );
 }
 
-function Drawer({ viewed, loggedIn, drawerLinks, onClick }) {
+function Drawer({ viewed, loggedIn, drawerLinks }) {
   return (
     <div className={`drawer ${viewed ? 'shown' : 'hidden'}`}>
       <div className="drawer-content">
         <div className="drawer-top hover-pointer">
-          <h1 onClick={() => onClick()}>Menu</h1>
+          <h1 onClick={() => drawerLinks[0].onClick()}>Menu</h1>
         </div>
         <div className="drawer-links">
           {loggedIn ? (
             drawerLinks.map((element, index) => (
-              <MenuItem onClick={onClick} key={index} menuItem={element} />
+              <MenuItem
+                onClick={drawerLinks[index].onClick}
+                key={index}
+                menuItem={element}
+              />
             ))
           ) : (
             <p>Sign In and become your own Curator to continue!</p>
@@ -86,7 +102,7 @@ function Drawer({ viewed, loggedIn, drawerLinks, onClick }) {
           ))} */}
         </div>
         <div className="close">
-          <p className="hover-pointer" onClick={() => onClick()}>
+          <p className="hover-pointer" onClick={() => drawerLinks[0].onClick()}>
             Close
           </p>
         </div>
@@ -100,16 +116,5 @@ function MenuItem({ menuItem, onClick }) {
     <Link onClick={() => onClick()} to={menuItem.link} className="link">
       {menuItem.name}
     </Link>
-  );
-}
-
-function SearchBar() {
-  return (
-    <div className="search-bar-wrap">
-      <input
-        type="text"
-        className="search-bar"
-        placeholder="Search by tag..."></input>
-    </div>
   );
 }

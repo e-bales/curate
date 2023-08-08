@@ -11,20 +11,8 @@
   margin: auto;
 }
 
-.search-bar-wrap {
-  padding-left: 0;
-}
-
 ::placeholder {
   color: #d0d0d0;
-}
-
-.search-bar {
-  border-radius: 1.5rem;
-  font-family: BebasNeue, sans-serif;
-  text-indent: 1rem;
-  font-size: 1rem;
-  border-color: #f9f9f9;
 }
 
 .row {

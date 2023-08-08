@@ -41,6 +41,10 @@ function App() {
     setGrayOut(false);
   }
 
+  function signOut() {
+    setLoggedIn(false);
+  }
+
   useEffect(() => {
     if (JSON.parse(sessionStorage.getItem('userObj'))?.user !== undefined) {
       setLoggedIn(true);
@@ -81,7 +85,11 @@ function App() {
         <Route
           path="/"
           element={
-            <NavBar logInOnClick={() => openLogin()} loggedIn={loggedIn} />
+            <NavBar
+              logInOnClick={() => openLogin()}
+              logOut={() => signOut()}
+              loggedIn={loggedIn}
+            />
           }>
           <Route
             index

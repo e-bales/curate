@@ -25,6 +25,18 @@ export default function Profile() {
     getFollowers(id);
   }, []);
 
+  async function handleSearch(event) {
+    event.preventDefault();
+    try {
+      console.log(event);
+      const formData = new FormData(event.target);
+      console.log(formData);
+      const userData = Object.fromEntries(formData.entries());
+      const query = userData.search;
+      console.log(query);
+    } catch (err) {}
+  }
+
   if (isLoading) return <LoadingModal />;
   if (error) {
     if (error.message.split(': ')[1] === 'Please log in to access this page.') {
@@ -51,7 +63,7 @@ export default function Profile() {
           <div className="curators-title-wrap">
             <h2 className="curators-title">Curators you follow</h2>
           </div>
-          <div className="search-wrap"></div>
+          <SearchBar onSubmit={handleSearch} />
           <div className="search-results"></div>
           <div className="follower-list"></div>
         </div>
@@ -105,4 +117,18 @@ async function requestFollowers(userId) {
       `Could not RETRIEVE followers for ${userId}...: ${err.message}`
     );
   }
+}
+
+function SearchBar({ onSubmit }) {
+  return (
+    <div className="search-bar-wrap">
+      <form onSubmit={(event) => onSubmit(event)}>
+        <input
+          type="text"
+          className="search-bar"
+          name="search"
+          placeholder="Search for fellow curators..."></input>
+      </form>
+    </div>
+  );
 }
