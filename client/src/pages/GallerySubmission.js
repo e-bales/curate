@@ -7,6 +7,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 export default function GallerySubmission({ edit }) {
   const { objectId } = useParams();
   const [isLoading, setIsLoading] = useState(true);
+  const [removed, setRemoved] = useState(false);
   const [error, setError] = useState();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submissionError, setSubmissionError] = useState(false);
@@ -37,9 +38,41 @@ export default function GallerySubmission({ edit }) {
     getData();
   }, [objectId]);
 
+  async function removeFromGallery(artId) {
+    try {
+      setSubmissionLoading(true);
+      const req = {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      };
+      const response = await fetch(
+        `/api/gallery/${
+          JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+        }/${artId}`,
+        req
+      );
+      if (!response.ok) {
+        throw new Error(
+          'Could not remove from Gallery, please try again later.'
+        );
+      }
+      setRemoved(true);
+    } catch (err) {
+      setSubmissionError(true);
+    } finally {
+      setSubmissionLoading(false);
+    }
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
     try {
+      if (removed) {
+        throw new Error('Could not submit to a deleted submission.');
+      }
       setSubmissionLoading(true);
       setSubmissionError(false);
       const formData = new FormData(event.target);
@@ -135,6 +168,8 @@ export default function GallerySubmission({ edit }) {
                   <label className="gallery-sub-title" htmlFor="gallery-text">
                     {isSubmitted
                       ? 'Succesfully submitted!'
+                      : edit
+                      ? 'Edit Submission'
                       : 'Gallery Submission'}
                   </label>
                   {submissionError ? (
@@ -150,10 +185,20 @@ export default function GallerySubmission({ edit }) {
                       className="belleza-font"
                       name="gallery-text"
                       maxLength={400}
-                      placeholder="Add your thoughts..."
-                    />
+                      disabled={removed}
+                      placeholder="Add your thoughts...">
+                      {edit && JSON.parse(sessionStorage.getItem('editData'))}
+                    </textarea>
+                    {edit && !removed && (
+                      <div
+                        onClick={() => removeFromGallery(artData.objectID)}
+                        className="delete-gallery-text hover-pointer">
+                        Remove from Gallery
+                      </div>
+                    )}
                   </div>
-                  {!isSubmitted ? (
+
+                  {!isSubmitted && !removed ? (
                     <div className="gallery-sub-button-wrap">
                       <button
                         disabled={submissionLoading}
@@ -242,7 +287,13 @@ function ReturnText() {
         <div className="gallery-col">
           <p
             className="hover-pointer return-text"
-            onClick={() => navigate('/gallery')}>
+            onClick={() =>
+              navigate(
+                `/gallery/${
+                  JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+                }`
+              )
+            }>
             To Gallery
           </p>
         </div>

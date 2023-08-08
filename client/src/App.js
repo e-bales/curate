@@ -93,6 +93,10 @@ function App() {
             path="gallery/submission/:objectId"
             element={<GallerySubmission />}
           />
+          <Route
+            path="gallery/submission/:objectId/edit"
+            element={<GallerySubmission edit={true} />}
+          />
           <Route path="department" element={<Department />} />
           <Route
             path="department/:departmentId/:pageNum"

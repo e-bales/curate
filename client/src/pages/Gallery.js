@@ -1,6 +1,7 @@
 import './Gallery.css';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { BsPencilSquare } from 'react-icons/bs';
 import LoadingModal from '../components/LoadingModal';
 import holderImage from '../default-product-img.jpg';
 
@@ -82,31 +83,38 @@ export default function Gallery() {
   }
   return (
     <div className="gallery-wrap">
-      <div className="gallery-title-wrap">
-        {sameUser ? 'Your Gallery' : `${name}'s Gallery`}
+      <div className="gallery-title-wrap bebas-font">
+        {sameUser ? 'Curate Your Gallery' : `${name}'s Gallery`}
       </div>
       <div className="gallery-content-wrap">
         {requestedArt?.map((element, index) => (
-          <GalleryDisplay artInfo={element} userInfo={userArtInfo[index]} />
+          <GalleryDisplay
+            artInfo={element}
+            userInfo={userArtInfo[index]}
+            sameUser={sameUser}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function GalleryDisplay({ userInfo, artInfo }) {
+function GalleryDisplay({ userInfo, artInfo, sameUser }) {
   console.log('ArtInfo is: ', artInfo);
-  const artId = artInfo.objectId;
+  console.log('UserInfo is: ', userInfo);
+  const artId = artInfo.objectID;
   const description = userInfo?.description;
 
   if (!userInfo) {
     return (
-      <div className="gd-wrap">
+      <div className="gd-wrap belleza-font">
         <div className="gd-col">
           <div className="gd-row gd-image">
-            <div className="gd-image-wrap">
-              <img src={holderImage} alt="Holder Piece" />
-            </div>
+            <Link to={`/favorites/1`} className="gd-image-link">
+              <div className="gd-image-wrap">
+                <img src={holderImage} alt="Holder Piece" />
+              </div>
+            </Link>
           </div>
           <div className="gd-row gd-info">
             <h3 className="gd-art-title">Curate your Gallery!</h3>
@@ -119,14 +127,20 @@ function GalleryDisplay({ userInfo, artInfo }) {
   }
 
   return (
-    <div className="gd-wrap">
+    <div className="gd-wrap belleza-font">
       <div className="gd-col">
+        {sameUser && <EditPencil artId={artId} description={description} />}
         <div className="gd-row gd-image">
           <Link to={`/object/${artId}`} className="gd-image-link">
             <div className="gd-image-wrap">
               <img
+                className="gd-art-image"
                 src={artInfo.primaryImageSmall}
-                alt={`Piece by ${artInfo.artistDisplayName}`}
+                alt={`Piece by ${
+                  artInfo.artistDisplayName
+                    ? artInfo.artistDisplayName
+                    : 'Unknown artist'
+                }`}
               />
             </div>
           </Link>
@@ -138,9 +152,27 @@ function GalleryDisplay({ userInfo, artInfo }) {
               ? artInfo.artistAlphaSort
               : 'Unknown artist'}
           </h3>
+          <div className="gd-row gd-description">{description}</div>
         </div>
-        <div className="gd-row gd-description">{description}</div>
       </div>
+    </div>
+  );
+}
+
+function EditPencil({ artId, description }) {
+  const navigate = useNavigate();
+
+  function toEdit() {
+    sessionStorage.setItem('editData', JSON.stringify(description));
+    navigate(`/gallery/submission/${artId}/edit`);
+  }
+
+  return (
+    <div className="edit-pencil-wrap">
+      <BsPencilSquare
+        onClick={() => toEdit()}
+        className="edit-pencil hover-pointer"
+      />
     </div>
   );
 }

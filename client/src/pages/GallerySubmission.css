@@ -65,3 +65,10 @@
   font-family: BebasNeue, sans-serif;
   font-size: 2rem;
 }
+
+.delete-gallery-text {
+  color: red;
+  text-decoration: underline;
+  font-size: 0.75rem;
+  padding-left: 1rem;
+}

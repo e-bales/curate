@@ -311,9 +311,11 @@ app.get('/api/favorites/:userId/:page', async (req, res, next) => {
     const page = Number(req.params.page);
     console.log(`Retrieving favorites, page: ${page}, for ${userId}`);
     const sql = `
-    select "artId"
+    select "artId",
+           "description"
       from "favorites"
     where "userId" = $1
+    order by "timeAdded"
     `;
     const params = [userId];
     const result = await db.query(sql, params);
@@ -326,7 +328,12 @@ app.get('/api/favorites/:userId/:page', async (req, res, next) => {
     let data = [];
     if (rows.length > 0) {
       const slicedRows = rows.slice((page - 1) * 10, page * 10);
-      const newRows = slicedRows.map((element) => element.artId);
+      // console.log('slicedRows: ', slicedRows);
+      const newRows = slicedRows.map((element) => ({
+        artId: element.artId,
+        isGallery: element.description !== null,
+      }));
+      // console.log('newRows: ', newRows);
       data = newRows;
     }
     const init = {
@@ -338,10 +345,11 @@ app.get('/api/favorites/:userId/:page', async (req, res, next) => {
     const artData = [];
     for (let i = 0; i < data.length; i++) {
       const art = await fetch(
-        `https://collectionapi.metmuseum.org/public/collection/v1/objects/${data[i]}`,
+        `https://collectionapi.metmuseum.org/public/collection/v1/objects/${data[i].artId}`,
         init
       );
       const json = await art.json();
+      json.isGallery = data[i].isGallery;
       // console.log('json: ', json);
       artData.push(json);
     }
@@ -426,6 +434,33 @@ app.post('/api/gallery/:userId/:artId', async (req, res, next) => {
     returning *;
     `;
     const params = [userId, artId, galleryText];
+    const result = await db.query(sql, params);
+    if (result.rowCount < 1) {
+      console.log(result);
+      throw new ClientError(404, `${artId} not in ${userId}'s favorites.`);
+    }
+    res.sendStatus(204);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete('/api/gallery/:userId/:artId', async (req, res, next) => {
+  try {
+    const userId = Number(req.params.userId);
+    const artId = Number(req.params.artId);
+    if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
+      throw new ClientError(
+        404,
+        `Could not remove ${artId} from user ${userId}'s gallery due to bad request params.`
+      );
+    }
+    const sql = `update "favorites"
+      set "description" = NULL
+    where "userId" = $1 AND "artId" = $2
+    returning *;
+    `;
+    const params = [userId, artId];
     const result = await db.query(sql, params);
     if (result.rowCount < 1) {
       console.log(result);

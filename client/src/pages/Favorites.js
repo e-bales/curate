@@ -180,9 +180,13 @@ function FavoritesDisplay(art) {
                 {art.objectDate ? `${art.objectDate}` : 'Unknown date'}
               </p>
             </div>
-            <Link to={`/gallery/submission/${art.objectID}`}>
-              <p className="gallery-addition">Add to your Gallery</p>
-            </Link>
+            {!art.isGallery ? (
+              <Link to={`/gallery/submission/${art.objectID}`}>
+                <p className="gallery-addition">Add to your Gallery</p>
+              </Link>
+            ) : (
+              <p className="gallery-addition">Already in your Gallery</p>
+            )}
           </div>
         </div>
       </div>
