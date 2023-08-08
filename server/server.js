@@ -407,10 +407,11 @@ app.get(
       const userId = Number(req.params.userId);
       console.log(`Retrieving followers for ${userId}`);
       const sql = `
-    select "followedUserId"
-      from "followers"
-    where "userId" = $1
+        select "followedUserId"
+          from "followers"
+        where "userId" = $1
     `;
+      // NEED TO WRITE A JOIN!
       const params = [userId];
       const result = await db.query(sql, params);
       const rows = result.rows;
@@ -427,6 +428,55 @@ app.get(
     }
   }
 );
+
+app.get('/api/user/search/:userId/:search', async (req, res, next) => {
+  try {
+    const search = req.params.search;
+    const userId = Number(req.params.userId);
+    console.log(`User ${userId} is searching for ${search}...`);
+    const sql = `
+      select "username",
+             "userId"
+        from "users"
+      where "username" LIKE $2 AND NOT "userId" = $1
+      `;
+    const searchPlus = '%' + search + '%';
+    const params = [userId, searchPlus];
+    const result = await db.query(sql, params);
+    res.status(201).json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/api/followers/add/:userId/:requestId', async (req, res, next) => {
+  try {
+    const userId = Number(req.params.userId);
+    const requestId = Number(req.params.requestId);
+    if (!Number.isInteger(userId) || !Number.isInteger(requestId)) {
+      throw new ClientError(
+        404,
+        `Could not add ${requestId} to user ${userId}'s followed list.`
+      );
+    }
+    console.log(`Attempting to send follower request to db`);
+    const sql = `
+    insert into "followers" ("userId", "followedUserId")
+    values ($1, $2)
+    returning *
+    `;
+    const params = [userId, requestId];
+    const result = await db.query(sql, params);
+    if (result.rows.length < 1) {
+      throw new ClientError(
+        404,
+        `Could not add ${requestId} to user ${userId}'s followed list.`
+      );
+    }
+  } catch (err) {
+    next(err);
+  }
+});
 
 app.post(
   '/api/gallery/:userId/:artId',

@@ -55,3 +55,29 @@
   color: #394855;
   border-color: #f9f9f9;
 }
+
+.search-error {
+  font-size: 0.85rem;
+  color: red;
+  padding-top: 1rem;
+}
+
+.search-results {
+  width: 100%;
+}
+
+.user-result-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 60%;
+  margin: auto;
+}
+
+.user-name-wrap {
+  display: flex;
+}
+
+.follow-button-wrap {
+  display: flex;
+}

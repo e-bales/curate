@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 export default function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
+  const [searchError, setSearchError] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
   const [followers, setFollowers] = useState([]);
 
   useEffect(() => {
@@ -28,13 +30,26 @@ export default function Profile() {
   async function handleSearch(event) {
     event.preventDefault();
     try {
-      console.log(event);
+      setSearchError(false);
       const formData = new FormData(event.target);
-      console.log(formData);
       const userData = Object.fromEntries(formData.entries());
-      const query = userData.search;
-      console.log(query);
-    } catch (err) {}
+      const search = userData.search;
+      if (search.split(' ').length > 1 || search.length < 3) {
+        throw new Error(' : Invalid search parameters');
+      }
+      const userId = JSON.parse(sessionStorage.getItem('userObj'))?.user.userId;
+      const req = {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+      };
+      const result = await getSearchData(req, userId, userData.search);
+      // console.log('result is: ', result);
+      setSearchResults(result);
+    } catch (err) {
+      setSearchError(err);
+    }
   }
 
   if (isLoading) return <LoadingModal />;
@@ -64,7 +79,17 @@ export default function Profile() {
             <h2 className="curators-title">Curators you follow</h2>
           </div>
           <SearchBar onSubmit={handleSearch} />
-          <div className="search-results"></div>
+          <div className="search-error">
+            {searchError &&
+              'Your search must be one word and over two characters long.'}
+          </div>
+          <div className="search-results">
+            {searchResults.map((element) => (
+              <div key={element.userId} className="user-wrap">
+                <UserResult user={element} />
+              </div>
+            ))}
+          </div>
           <div className="follower-list"></div>
         </div>
         <div className="profile-column right">
@@ -119,6 +144,20 @@ async function requestFollowers(userId) {
   }
 }
 
+async function getSearchData(req, userId, search) {
+  try {
+    console.log('Req is: ', req);
+    const res = await fetch(`/api/user/search/${userId}/${search}`, req);
+    if (!res.ok) {
+      throw new Error('Could not retrieve users of that search...');
+    }
+    const data = await res.json();
+    return data;
+  } catch {
+    throw new Error('Could not retrieve search data...');
+  }
+}
+
 function SearchBar({ onSubmit }) {
   return (
     <div className="search-bar-wrap">
@@ -127,8 +166,47 @@ function SearchBar({ onSubmit }) {
           type="text"
           className="search-bar"
           name="search"
+          autoComplete="off"
           placeholder="Search for fellow curators..."></input>
       </form>
+    </div>
+  );
+}
+
+function UserResult({ user }) {
+  async function followUser() {
+    try {
+      const req = {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+      };
+      const currId = JSON.parse(sessionStorage.getItem('userObj'))?.user.userId;
+      const requestId = user.userId;
+      console.log(`User ${currId} is attempting to follow ${requestId}`);
+      const res = await fetch(`/api/followers/add/${currId}/${requestId}`, req);
+      if (!res.ok) {
+        throw new Error('Could not add to followers');
+      }
+    } catch (err) {
+      alert('Could not follow user, please try again later.');
+    }
+  }
+
+  return (
+    <div className="user-result-wrap">
+      <div className="user-name-wrap">
+        <h3 className="user-name">{user.username}</h3>
+      </div>
+      <div className="follow-button-wrap">
+        <button
+          onClick={() => followUser()}
+          type="button"
+          className="follow-button">
+          Follow
+        </button>
+      </div>
     </div>
   );
 }
