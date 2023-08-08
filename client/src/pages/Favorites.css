@@ -1,0 +1,15 @@
+/* .gallery-addition {
+  display: block;
+} */
+
+.favorites-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.gallery-addition {
+  text-decoration: underline;
+  margin: 0;
+  font-size: 0.75rem;
+  color: #9ba3a9;
+}

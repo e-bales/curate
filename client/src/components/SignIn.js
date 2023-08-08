@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 export default function SignIn({ subtextOnClick, onSignIn }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [invalidCred, setInvalidCred] = useState(false);
 
   async function delay(msecs) {
     return new Promise((resolve) => setTimeout(() => resolve(), msecs));
@@ -12,6 +13,7 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
     event.preventDefault();
     try {
       setIsLoading(true);
+      setInvalidCred(false);
       const formData = new FormData(event.target);
       const userData = Object.fromEntries(formData.entries());
       const req = {
@@ -24,6 +26,7 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
         throw new Error(`fetch Error ${res.status}`);
       }
       const { user, token } = await res.json();
+      console.log('User is: ', user);
       const favorites = await fetch(`/api/favorites/${user.userId}`);
       const favoritesJSON = await favorites.json();
       sessionStorage.setItem('favorites', JSON.stringify(favoritesJSON));
@@ -36,7 +39,10 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
       delay(1500);
       onSignIn();
     } catch (err) {
-      alert(`Error signing in: ${err}`);
+      if (err.message !== 'fetch Error 401') {
+        alert(`Error signing in: ${err}`);
+      }
+      setInvalidCred(true);
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +62,7 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
                   required
                   name="username"
                   type="text"
-                  className="form-input"
+                  className={`form-input ${invalidCred ? 'error-input' : ''}`}
                   placeholder="Username"
                   autoComplete="off"
                 />
@@ -64,9 +70,14 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
                   required
                   name="password"
                   type="password"
-                  className="form-input"
+                  className={`form-input ${invalidCred ? 'error-input' : ''}`}
                   placeholder="Password"
                 />
+                {invalidCred && (
+                  <p className="error">
+                    Invalid credentials...please try again.
+                  </p>
+                )}
                 <div className="line"></div>
                 <div className="button-wrap">
                   <button

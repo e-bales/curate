@@ -66,7 +66,10 @@ export default function Profile() {
             </Link>
           </div>
           <div className="profile-button-wrap">
-            <Link to={'/gallery'}>
+            <Link
+              to={`/gallery/${
+                JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+              }`}>
               <button
                 className="profile-button bebas-font hover-pointer"
                 type="button">

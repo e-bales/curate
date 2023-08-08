@@ -60,7 +60,7 @@ export default function Favorites() {
       <div className="display-column">
         {requestedArt?.map((artPiece) => (
           <div key={artPiece.objectID} className="piece-wrap">
-            <ArtDisplay art={artPiece} />
+            <FavoritesDisplay art={artPiece} />
           </div>
         ))}
       </div>
@@ -126,7 +126,7 @@ async function getFavoritesData(id, page) {
   }
 }
 
-function ArtDisplay(art) {
+function FavoritesDisplay(art) {
   art = art.art;
   console.log('Creating art for: ', art);
   if (art.message === 'Not a valid object') {
@@ -171,8 +171,8 @@ function ArtDisplay(art) {
               />
             </div>
           </div>
-          <div className="information-row">
-            <div className="artist-title belleza-font">
+          <div className="information-row favorites-col belleza-font">
+            <div className="artist-title">
               <p>
                 {art.artistAlphaSort ? art.artistAlphaSort : 'Unknown artist'}
               </p>
@@ -180,6 +180,13 @@ function ArtDisplay(art) {
                 {art.objectDate ? `${art.objectDate}` : 'Unknown date'}
               </p>
             </div>
+            {!art.isGallery ? (
+              <Link to={`/gallery/submission/${art.objectID}`}>
+                <p className="gallery-addition">Add to your Gallery</p>
+              </Link>
+            ) : (
+              <p className="gallery-addition">Already in your Gallery</p>
+            )}
           </div>
         </div>
       </div>
