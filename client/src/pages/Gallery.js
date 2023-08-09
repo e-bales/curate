@@ -66,7 +66,7 @@ export default function Gallery() {
     }
     setIsLoading(true);
     getGalleryData();
-  }, []);
+  }, [userId]);
 
   if (isLoading) return <LoadingModal />;
   if (error) {
@@ -111,15 +111,29 @@ function GalleryDisplay({ userInfo, artInfo, sameUser }) {
       <div className="gd-wrap belleza-font">
         <div className="gd-col">
           <div className="gd-row gd-image">
-            <Link to={`/favorites/1`} className="gd-image-link">
-              <div className="gd-image-wrap">
-                <img src={holderImage} alt="Holder Piece" />
+            {sameUser ? (
+              <Link to={`/favorites/1`} className="gd-image-link">
+                <div className="gd-image-wrap">
+                  <img src={holderImage} alt="Holder Piece" />
+                </div>
+              </Link>
+            ) : (
+              <div className="gd-image-link">
+                <div className="gd-image-wrap">
+                  <img src={holderImage} alt="Holder Piece" />
+                </div>
               </div>
-            </Link>
+            )}
           </div>
           <div className="gd-row gd-info">
-            <h3 className="gd-art-title">Curate your Gallery!</h3>
-            <h3 className="gd-art-artist">Add from Your Favorites</h3>
+            <h3 className="gd-art-title">
+              {sameUser
+                ? 'Curate your Gallery!'
+                : 'Encourage others to add to their Gallery!'}
+            </h3>
+            <h3 className="gd-art-artist">
+              {sameUser ? 'Add from Your Favorites' : ''}
+            </h3>
           </div>
           <div className="gd-row gd-description"></div>
         </div>

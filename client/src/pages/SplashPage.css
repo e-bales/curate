@@ -57,3 +57,18 @@ img {
 .heart {
   font-size: 1.5rem;
 }
+
+.splash-image {
+  max-width: 45rem;
+}
+
+.splash-heart {
+  top: 1rem;
+  right: 1rem;
+}
+
+.splash-heart-wrap {
+  position: absolute;
+  top: 3rem;
+  right: 3rem;
+}

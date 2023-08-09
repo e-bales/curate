@@ -74,7 +74,7 @@ export default function Profile() {
         req
       );
       setFollowers((prev) => {
-        return prev.filter((element) => element.id !== requestedId);
+        return prev.filter((element) => element.userId !== requestedId);
       });
       console.log(result);
     } catch (err) {
@@ -134,7 +134,7 @@ export default function Profile() {
                 <UserFollower
                   key={index}
                   followedUser={element}
-                  onClick={() => unFollowUser(element.id)}
+                  onClick={() => unFollowUser(element.userId)}
                 />
               </div>
             ))}
@@ -276,10 +276,11 @@ function UserResult({ user, setFollowers, followers }) {
 }
 
 function UserFollower({ followedUser, onClick }) {
+  console.log('User created with: ', followedUser);
   return (
     <div className="followed-user-wrap">
       <div className="user-column">
-        <Link to={`/gallery/${followedUser.id}`} className="follower-link">
+        <Link to={`/gallery/${followedUser.userId}`} className="follower-link">
           <h3 className="followed-user-name">{followedUser.username}</h3>
         </Link>
       </div>
