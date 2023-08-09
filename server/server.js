@@ -141,6 +141,7 @@ app.get('/api/db/:userId', async (req, res, next) => {
     const params = [userId];
     const result = await db.query(sql, params);
     const [user] = result.rows;
+    // console.log('Db user is: ', user);
     if (!user) {
       throw new ClientError(404, 'Could not find the requested user.');
     }
@@ -248,6 +249,7 @@ app.get(
 
 app.delete(
   '/api/favorites/delete/:userId/:objectId',
+  authorizationMiddleware,
   async (req, res, next) => {
     try {
       console.log('Attempting to delete favorited image...');
@@ -275,35 +277,39 @@ app.delete(
   }
 );
 
-app.post('/api/favorites/add/:userId/:objectId', async (req, res, next) => {
-  try {
-    console.log('Attempting to add favorited image...');
-    const userId = Number(req.params.userId);
-    const artId = Number(req.params.objectId);
-    if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
-      throw new ClientError(
-        404,
-        `Could not add ${artId} to user ${userId}'s favorites.`
-      );
-    }
-    const sql = `
+app.post(
+  '/api/favorites/add/:userId/:objectId',
+  authorizationMiddleware,
+  async (req, res, next) => {
+    try {
+      console.log('Attempting to add favorited image...');
+      const userId = Number(req.params.userId);
+      const artId = Number(req.params.objectId);
+      if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
+        throw new ClientError(
+          404,
+          `Could not add ${artId} to user ${userId}'s favorites.`
+        );
+      }
+      const sql = `
     insert into "favorites" ("userId", "artId")
     values ($1, $2)
     returning *
     `;
-    const params = [userId, artId];
-    const result = await db.query(sql, params);
-    if (result.rowCount < 1) {
-      throw new ClientError(
-        404,
-        `Could not add ${artId} to user ${userId}'s favorites.`
-      );
+      const params = [userId, artId];
+      const result = await db.query(sql, params);
+      if (result.rowCount < 1) {
+        throw new ClientError(
+          404,
+          `Could not add ${artId} to user ${userId}'s favorites.`
+        );
+      }
+      res.sendStatus(204);
+    } catch (err) {
+      next(err);
     }
-    res.sendStatus(204);
-  } catch (err) {
-    next(err);
   }
-});
+);
 
 app.get(
   '/api/favorites/:userId/:page',
@@ -406,16 +412,39 @@ app.get(
     try {
       const userId = Number(req.params.userId);
       console.log(`Retrieving followers for ${userId}`);
+      // const sql = `
+      //   select "f"."followedUserId",
+      //          "u"."username"
+      //     from "followers" as "f"
+      //   join "users" as "u" using ("userId")
+      //   where "userId" = $1
+      // `;
       const sql = `
         select "followedUserId"
           from "followers"
         where "userId" = $1
-    `;
+        `;
       // NEED TO WRITE A JOIN!
       const params = [userId];
       const result = await db.query(sql, params);
       const rows = result.rows;
-      res.status(201).json(rows);
+      console.log('Rows is: ', rows);
+      const newRows = [];
+      for (let i = 0; i < rows.length; i++) {
+        const usernameSql = `
+        select "username"
+          from "users"
+        where "userId" = $1
+        `;
+        const usernameParams = [rows[i].followedUserId];
+        const result = await db.query(usernameSql, usernameParams);
+        const newObj = {
+          id: rows[i].followedUserId,
+          username: result.rows[0].username,
+        };
+        newRows.push(newObj);
+      }
+      res.status(201).json(newRows);
 
       // if (rows.length > 0) {
       //   const newRows = rows.map((element) => element.artId);
@@ -473,10 +502,45 @@ app.post('/api/followers/add/:userId/:requestId', async (req, res, next) => {
         `Could not add ${requestId} to user ${userId}'s followed list.`
       );
     }
+    res.status(201).json(result.rows);
   } catch (err) {
     next(err);
   }
 });
+
+app.delete(
+  '/api/followers/delete/:userId/:requestId',
+  async (req, res, next) => {
+    try {
+      const userId = Number(req.params.userId);
+      const requestId = Number(req.params.requestId);
+      if (!Number.isInteger(userId) || !Number.isInteger(requestId)) {
+        throw new ClientError(
+          404,
+          `Could not add ${requestId} to user ${userId}'s followed list.`
+        );
+      }
+      console.log(`Attempting to send follower DELETE request to db`);
+      const sql = `
+    delete
+      from "followers"
+      where "userId" = $1 and "followedUserId" = $2
+    returning *
+    `;
+      const params = [userId, requestId];
+      const result = await db.query(sql, params);
+      if (result.rows.length < 1) {
+        throw new ClientError(
+          404,
+          `Could not remove ${requestId} to user ${userId}'s followed list.`
+        );
+      }
+      res.status(201).json(result.rows);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
 app.post(
   '/api/gallery/:userId/:artId',

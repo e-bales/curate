@@ -4,7 +4,7 @@ import Heart from '../components/Heart';
 import { departments } from '../department';
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { BsArrowBarLeft, BsArrowBarRight, BsHeart } from 'react-icons/bs';
+import { BsArrowBarLeft, BsArrowBarRight } from 'react-icons/bs';
 
 export default function MultiDisplay() {
   const { departmentId, pageNum: page } = useParams();

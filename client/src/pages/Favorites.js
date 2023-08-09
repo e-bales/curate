@@ -61,27 +61,35 @@ export default function Favorites() {
         <h1 className="title bebas-font">Your Favorites</h1>
       </div>
       <div className="display-column">
-        {requestedArt?.map((artPiece) => (
-          <div key={artPiece.objectID} className="piece-wrap">
-            <FavoritesDisplay art={artPiece} galleryMax={galleryMax} />
-          </div>
-        ))}
+        {requestedArt.length === 0 ? (
+          <p className="no-favorites bebas-font">
+            Explore the site to add to your favorites!
+          </p>
+        ) : (
+          requestedArt?.map((artPiece) => (
+            <div key={artPiece.objectID} className="piece-wrap">
+              <FavoritesDisplay art={artPiece} galleryMax={galleryMax} />
+            </div>
+          ))
+        )}
       </div>
-      <div className="page-traversal">
-        <FavoritesLink
-          page={Number(page)}
-          left={true}
-          moreData={moreData}
-          onClick={() => navigate(`/favorites/${Number(page) - 1}`)}
-        />
-        <p className="page-number bebas-font">{page}</p>
-        <FavoritesLink
-          page={Number(page)}
-          left={false}
-          moreData={moreData}
-          onClick={() => navigate(`/favorites/${Number(page) + 1}`)}
-        />
-      </div>
+      {requestedArt.length !== 0 && (
+        <div className="page-traversal">
+          <FavoritesLink
+            page={Number(page)}
+            left={true}
+            moreData={moreData}
+            onClick={() => navigate(`/favorites/${Number(page) - 1}`)}
+          />
+          <p className="page-number bebas-font">{page}</p>
+          <FavoritesLink
+            page={Number(page)}
+            left={false}
+            moreData={moreData}
+            onClick={() => navigate(`/favorites/${Number(page) + 1}`)}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -131,8 +139,6 @@ async function getFavoritesData(id, page) {
 
 function FavoritesDisplay({ art, galleryMax }) {
   // art = art.art;
-  console.log('Creating art for: ', art);
-  console.log('GalleryMax was passed in as: ', galleryMax);
   if (art.message === 'Not a valid object') {
     return;
   }

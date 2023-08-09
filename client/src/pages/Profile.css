@@ -10,6 +10,7 @@
   flex-direction: column;
   align-items: center;
   width: 50%;
+  padding-bottom: 3rem;
 }
 
 .profile-title {
@@ -29,6 +30,7 @@
   color: #f9f9f9;
   font-size: 1.5rem;
   border-color: #9fb4c7;
+  border-radius: 1rem;
 }
 
 .profile-button-wrap {
@@ -76,8 +78,75 @@
 
 .user-name-wrap {
   display: flex;
+  color: #394855;
+}
+
+.user-name {
+  letter-spacing: 0.5px;
 }
 
 .follow-button-wrap {
   display: flex;
+}
+
+.follow-button {
+  padding: 0.3rem 1rem;
+  border-radius: 0.25rem;
+}
+
+.follower-list-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.follower-list {
+  display: flex;
+  flex-direction: column;
+
+  /* align-items: center; */
+  width: 70%;
+}
+
+.followers-title {
+  color: #394855;
+  letter-spacing: 1px;
+  display: flex;
+  justify-content: center;
+}
+
+.followed {
+  background-color: greenyellow;
+  color: #f9f9f9;
+}
+
+.user-column {
+  width: 50%;
+  display: flex;
+  align-items: center;
+}
+
+.profile-right {
+  justify-content: right;
+}
+
+.followed-user-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.follower-link {
+  display: flex;
+  justify-content: left;
+  color: #394855;
+  text-decoration: none;
+}
+
+.unfollow {
+  display: flex;
+  justify-content: right;
+  text-decoration: underline;
+  color: rgb(147, 0, 0);
+  font-size: 0.75rem;
 }

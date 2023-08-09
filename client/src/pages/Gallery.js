@@ -12,8 +12,8 @@ export default function Gallery() {
   const [isLoading, setIsLoading] = useState(false);
   const [sameUser, setSameUser] = useState(true);
   const [error, setError] = useState();
-
-  let name;
+  const [name, setName] = useState(undefined);
+  // let name;
 
   useEffect(() => {
     async function getGalleryData() {
@@ -24,20 +24,20 @@ export default function Gallery() {
         if (!id) {
           throw new Error(' : Please log in to access this page.');
         }
-        if (id !== Number(userId)) {
-          setSameUser(false);
-          const data = await fetch(`/api/db/${userId}`);
-          const otherJson = data.json();
-          name = otherJson.username;
-          console.log("Other user's data is: ", data);
-        }
         const req = {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem('token')}`,
           },
         };
-        const response = await fetch(`/api/gallery/${id}`, req);
+        if (id !== Number(userId)) {
+          setSameUser(false);
+          const data = await fetch(`/api/db/${userId}`);
+          const otherJson = await data.json();
+          setName(otherJson.username);
+          console.log("Other user's data is: ", data);
+        }
+        const response = await fetch(`/api/gallery/${userId}`, req);
         if (!response.ok) {
           throw new Error('Could not retrieve gallery data...');
         }
@@ -89,6 +89,7 @@ export default function Gallery() {
       <div className="gallery-content-wrap">
         {requestedArt?.map((element, index) => (
           <GalleryDisplay
+            key={index}
             artInfo={element}
             userInfo={userArtInfo[index]}
             sameUser={sameUser}
