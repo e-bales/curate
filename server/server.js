@@ -172,6 +172,44 @@ app.get('/api/db/:userId', async (req, res, next) => {
 //   }
 // });
 
+app.get('/api/museum/random', async (req, res, next) => {
+  try {
+    console.log('Attempting to pull random data...');
+    const url =
+      'https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=11&q=painting&hasImage=true';
+    let data = await getMuseumData(url);
+    data = data.objectIDs;
+    const artData = [];
+    const usedAlready = [];
+    const init = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    while (artData.length < 6) {
+      const item = data[Math.floor(Math.random() * data.length)];
+      if (usedAlready.includes(item)) {
+        continue;
+      }
+      const art = await fetch(
+        `https://collectionapi.metmuseum.org/public/collection/v1/objects/${item}`,
+        init
+      );
+      const json = await art.json();
+      if (json.primaryImageSmall.length === 0) {
+        continue;
+      }
+      usedAlready.push(item);
+      const artObj = { id: item, imageUrl: json.primaryImageSmall };
+      artData.push(artObj);
+    }
+    res.status(201).json(artData);
+  } catch (err) {
+    next(err);
+  }
+});
+
 /**
  * Retrieves the the 'page'th 10 art objectID's
  */
@@ -324,7 +362,7 @@ app.get(
            "description"
       from "favorites"
     where "userId" = $1
-    order by "timeAdded"
+    order by "timeAdded" desc
     `;
       const params = [userId];
       const result = await db.query(sql, params);
@@ -399,6 +437,7 @@ app.get('/api/favorites/:userId', async (req, res, next) => {
     const result = await db.query(sql, params);
     const rows = result.rows;
     const newRows = rows.map((element) => element.artId);
+    // console.log('newRows is: ', newRows);
     res.status(201).json(newRows);
   } catch (err) {
     next(err);
@@ -439,7 +478,7 @@ app.get(
         const usernameParams = [rows[i].followedUserId];
         const result = await db.query(usernameSql, usernameParams);
         const newObj = {
-          id: rows[i].followedUserId,
+          userId: rows[i].followedUserId,
           username: result.rows[0].username,
         };
         newRows.push(newObj);
