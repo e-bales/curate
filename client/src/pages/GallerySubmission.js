@@ -77,10 +77,13 @@ export default function GallerySubmission({ edit }) {
       setSubmissionError(false);
       const formData = new FormData(event.target);
       const userData = Object.fromEntries(formData.entries());
-      console.log(userData['gallery-text']);
+      // console.log(userData['gallery-text']);
       const req = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(userData),
       };
       const res = await fetch(

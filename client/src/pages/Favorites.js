@@ -10,6 +10,7 @@ export default function Favorites() {
   // const [page, setPage] = useState(pageNum);
   const [moreData, setMoreData] = useState(true);
   const [requestedArt, setRequestedArt] = useState();
+  const [galleryMax, setGalleryMax] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
   const navigate = useNavigate();
@@ -26,6 +27,8 @@ export default function Favorites() {
           throw new Error(' : Please log in to access this page.');
         }
         const data = await getFavoritesData(id, page);
+        setGalleryMax(data.galleryFull);
+        console.log('Gallery Max is: ', data.galleryFull);
         setMoreData(data.more);
         setRequestedArt(data.data);
       } catch (err) {
@@ -58,27 +61,35 @@ export default function Favorites() {
         <h1 className="title bebas-font">Your Favorites</h1>
       </div>
       <div className="display-column">
-        {requestedArt?.map((artPiece) => (
-          <div key={artPiece.objectID} className="piece-wrap">
-            <FavoritesDisplay art={artPiece} />
-          </div>
-        ))}
+        {requestedArt.length === 0 ? (
+          <p className="no-favorites bebas-font">
+            Explore the site to add to your favorites!
+          </p>
+        ) : (
+          requestedArt?.map((artPiece) => (
+            <div key={artPiece.objectID} className="piece-wrap">
+              <FavoritesDisplay art={artPiece} galleryMax={galleryMax} />
+            </div>
+          ))
+        )}
       </div>
-      <div className="page-traversal">
-        <FavoritesLink
-          page={Number(page)}
-          left={true}
-          moreData={moreData}
-          onClick={() => navigate(`/favorites/${Number(page) - 1}`)}
-        />
-        <p className="page-number bebas-font">{page}</p>
-        <FavoritesLink
-          page={Number(page)}
-          left={false}
-          moreData={moreData}
-          onClick={() => navigate(`/favorites/${Number(page) + 1}`)}
-        />
-      </div>
+      {requestedArt.length !== 0 && (
+        <div className="page-traversal">
+          <FavoritesLink
+            page={Number(page)}
+            left={true}
+            moreData={moreData}
+            onClick={() => navigate(`/favorites/${Number(page) - 1}`)}
+          />
+          <p className="page-number bebas-font">{page}</p>
+          <FavoritesLink
+            page={Number(page)}
+            left={false}
+            moreData={moreData}
+            onClick={() => navigate(`/favorites/${Number(page) + 1}`)}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -126,9 +137,8 @@ async function getFavoritesData(id, page) {
   }
 }
 
-function FavoritesDisplay(art) {
-  art = art.art;
-  console.log('Creating art for: ', art);
+function FavoritesDisplay({ art, galleryMax }) {
+  // art = art.art;
   if (art.message === 'Not a valid object') {
     return;
   }
@@ -180,7 +190,9 @@ function FavoritesDisplay(art) {
                 {art.objectDate ? `${art.objectDate}` : 'Unknown date'}
               </p>
             </div>
-            {!art.isGallery ? (
+            {galleryMax ? (
+              <p className="gallery-addition">Your Gallery is Full</p>
+            ) : !art.isGallery ? (
               <Link to={`/gallery/submission/${art.objectID}`}>
                 <p className="gallery-addition">Add to your Gallery</p>
               </Link>

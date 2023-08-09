@@ -141,6 +141,7 @@ app.get('/api/db/:userId', async (req, res, next) => {
     const params = [userId];
     const result = await db.query(sql, params);
     const [user] = result.rows;
+    // console.log('Db user is: ', user);
     if (!user) {
       throw new ClientError(404, 'Could not find the requested user.');
     }
@@ -248,6 +249,7 @@ app.get(
 
 app.delete(
   '/api/favorites/delete/:userId/:objectId',
+  authorizationMiddleware,
   async (req, res, next) => {
     try {
       console.log('Attempting to delete favorited image...');
@@ -275,96 +277,115 @@ app.delete(
   }
 );
 
-app.post('/api/favorites/add/:userId/:objectId', async (req, res, next) => {
-  try {
-    console.log('Attempting to add favorited image...');
-    const userId = Number(req.params.userId);
-    const artId = Number(req.params.objectId);
-    if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
-      throw new ClientError(
-        404,
-        `Could not add ${artId} to user ${userId}'s favorites.`
-      );
-    }
-    const sql = `
+app.post(
+  '/api/favorites/add/:userId/:objectId',
+  authorizationMiddleware,
+  async (req, res, next) => {
+    try {
+      console.log('Attempting to add favorited image...');
+      const userId = Number(req.params.userId);
+      const artId = Number(req.params.objectId);
+      if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
+        throw new ClientError(
+          404,
+          `Could not add ${artId} to user ${userId}'s favorites.`
+        );
+      }
+      const sql = `
     insert into "favorites" ("userId", "artId")
     values ($1, $2)
     returning *
     `;
-    const params = [userId, artId];
-    const result = await db.query(sql, params);
-    if (result.rowCount < 1) {
-      throw new ClientError(
-        404,
-        `Could not add ${artId} to user ${userId}'s favorites.`
-      );
+      const params = [userId, artId];
+      const result = await db.query(sql, params);
+      if (result.rowCount < 1) {
+        throw new ClientError(
+          404,
+          `Could not add ${artId} to user ${userId}'s favorites.`
+        );
+      }
+      res.sendStatus(204);
+    } catch (err) {
+      next(err);
     }
-    res.sendStatus(204);
-  } catch (err) {
-    next(err);
   }
-});
+);
 
-app.get('/api/favorites/:userId/:page', async (req, res, next) => {
-  try {
-    const userId = Number(req.params.userId);
-    const page = Number(req.params.page);
-    console.log(`Retrieving favorites, page: ${page}, for ${userId}`);
-    const sql = `
+app.get(
+  '/api/favorites/:userId/:page',
+  authorizationMiddleware,
+  async (req, res, next) => {
+    try {
+      const userId = Number(req.params.userId);
+      const page = Number(req.params.page);
+      console.log(`Retrieving favorites, page: ${page}, for ${userId}`);
+      const sql = `
     select "artId",
            "description"
       from "favorites"
     where "userId" = $1
     order by "timeAdded"
     `;
-    const params = [userId];
-    const result = await db.query(sql, params);
-    const rows = result.rows;
-    let moreData = true;
-    // console.log('Next spot = :', data.objectIDs[page * 10]);
-    if (!rows[page * 10]) {
-      moreData = false;
-    }
-    let data = [];
-    if (rows.length > 0) {
-      const slicedRows = rows.slice((page - 1) * 10, page * 10);
-      // console.log('slicedRows: ', slicedRows);
-      const newRows = slicedRows.map((element) => ({
-        artId: element.artId,
-        isGallery: element.description !== null,
-      }));
-      // console.log('newRows: ', newRows);
-      data = newRows;
-    }
-    const init = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-    const artData = [];
-    for (let i = 0; i < data.length; i++) {
-      const art = await fetch(
-        `https://collectionapi.metmuseum.org/public/collection/v1/objects/${data[i].artId}`,
-        init
-      );
-      const json = await art.json();
-      json.isGallery = data[i].isGallery;
-      // console.log('json: ', json);
-      artData.push(json);
-    }
+      const params = [userId];
+      const result = await db.query(sql, params);
+      const rows = result.rows;
+      let moreData = true;
+      // console.log('Next spot = :', data.objectIDs[page * 10]);
+      if (!rows[page * 10]) {
+        moreData = false;
+      }
+      let data = [];
+      if (rows.length > 0) {
+        const slicedRows = rows.slice((page - 1) * 10, page * 10);
+        // console.log('slicedRows: ', slicedRows);
+        const newRows = slicedRows.map((element) => ({
+          artId: element.artId,
+          isGallery: element.description !== null,
+        }));
+        // console.log('newRows: ', newRows);
+        data = newRows;
+      }
+      const init = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+      const artData = [];
+      for (let i = 0; i < data.length; i++) {
+        const art = await fetch(
+          `https://collectionapi.metmuseum.org/public/collection/v1/objects/${data[i].artId}`,
+          init
+        );
+        const json = await art.json();
+        json.isGallery = data[i].isGallery;
+        // console.log('json: ', json);
+        artData.push(json);
+      }
 
-    const returningData = {
-      data: artData,
-      more: moreData,
-    };
+      const sqlCount = `
+    select count(*) as "totalGallery"
+      from "favorites"
+    where "userId" = $1 AND "description" IS NOT NULL
+    `;
+      const totalResult = await db.query(sqlCount, params);
+      const total = totalResult.rows[0]?.totalGallery;
+      console.log('Total is: ', total);
 
-    res.status(201).json(returningData);
-  } catch (err) {
-    next(err);
+      const returningData = {
+        data: artData,
+        more: moreData,
+        galleryFull: total >= 5,
+      };
+
+      res.status(201).json(returningData);
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
+// Just gets the id's for localStorage, not retrieving api data
 app.get('/api/favorites/:userId', async (req, res, next) => {
   try {
     const userId = Number(req.params.userId);
@@ -391,15 +412,39 @@ app.get(
     try {
       const userId = Number(req.params.userId);
       console.log(`Retrieving followers for ${userId}`);
+      // const sql = `
+      //   select "f"."followedUserId",
+      //          "u"."username"
+      //     from "followers" as "f"
+      //   join "users" as "u" using ("userId")
+      //   where "userId" = $1
+      // `;
       const sql = `
-    select "followedUserId"
-      from "followers"
-    where "userId" = $1
-    `;
+        select "followedUserId"
+          from "followers"
+        where "userId" = $1
+        `;
+      // NEED TO WRITE A JOIN!
       const params = [userId];
       const result = await db.query(sql, params);
       const rows = result.rows;
-      res.status(201).json(rows);
+      console.log('Rows is: ', rows);
+      const newRows = [];
+      for (let i = 0; i < rows.length; i++) {
+        const usernameSql = `
+        select "username"
+          from "users"
+        where "userId" = $1
+        `;
+        const usernameParams = [rows[i].followedUserId];
+        const result = await db.query(usernameSql, usernameParams);
+        const newObj = {
+          id: rows[i].followedUserId,
+          username: result.rows[0].username,
+        };
+        newRows.push(newObj);
+      }
+      res.status(201).json(newRows);
 
       // if (rows.length > 0) {
       //   const newRows = rows.map((element) => element.artId);
@@ -413,87 +458,183 @@ app.get(
   }
 );
 
-app.post('/api/gallery/:userId/:artId', async (req, res, next) => {
+app.get('/api/user/search/:userId/:search', async (req, res, next) => {
+  try {
+    const search = req.params.search;
+    const userId = Number(req.params.userId);
+    console.log(`User ${userId} is searching for ${search}...`);
+    const sql = `
+      select "username",
+             "userId"
+        from "users"
+      where "username" LIKE $2 AND NOT "userId" = $1
+      `;
+    const searchPlus = '%' + search + '%';
+    const params = [userId, searchPlus];
+    const result = await db.query(sql, params);
+    res.status(201).json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post('/api/followers/add/:userId/:requestId', async (req, res, next) => {
   try {
     const userId = Number(req.params.userId);
-    const artId = Number(req.params.artId);
-    console.log('userID: ', userId);
-    console.log('artId: ', artId);
-    if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
+    const requestId = Number(req.params.requestId);
+    if (!Number.isInteger(userId) || !Number.isInteger(requestId)) {
       throw new ClientError(
         404,
-        `Could not add ${artId} to user ${userId}'s gallery due to bad request params.`
+        `Could not add ${requestId} to user ${userId}'s followed list.`
       );
     }
-    const galleryText = req.body['gallery-text'];
-    console.log('Gallery submission info is: ', galleryText);
+    console.log(`Attempting to send follower request to db`);
     const sql = `
+    insert into "followers" ("userId", "followedUserId")
+    values ($1, $2)
+    returning *
+    `;
+    const params = [userId, requestId];
+    const result = await db.query(sql, params);
+    if (result.rows.length < 1) {
+      throw new ClientError(
+        404,
+        `Could not add ${requestId} to user ${userId}'s followed list.`
+      );
+    }
+    res.status(201).json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete(
+  '/api/followers/delete/:userId/:requestId',
+  async (req, res, next) => {
+    try {
+      const userId = Number(req.params.userId);
+      const requestId = Number(req.params.requestId);
+      if (!Number.isInteger(userId) || !Number.isInteger(requestId)) {
+        throw new ClientError(
+          404,
+          `Could not add ${requestId} to user ${userId}'s followed list.`
+        );
+      }
+      console.log(`Attempting to send follower DELETE request to db`);
+      const sql = `
+    delete
+      from "followers"
+      where "userId" = $1 and "followedUserId" = $2
+    returning *
+    `;
+      const params = [userId, requestId];
+      const result = await db.query(sql, params);
+      if (result.rows.length < 1) {
+        throw new ClientError(
+          404,
+          `Could not remove ${requestId} to user ${userId}'s followed list.`
+        );
+      }
+      res.status(201).json(result.rows);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+app.post(
+  '/api/gallery/:userId/:artId',
+  authorizationMiddleware,
+  async (req, res, next) => {
+    try {
+      const userId = Number(req.params.userId);
+      const artId = Number(req.params.artId);
+      console.log('userID: ', userId);
+      console.log('artId: ', artId);
+      if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
+        throw new ClientError(
+          404,
+          `Could not add ${artId} to user ${userId}'s gallery due to bad request params.`
+        );
+      }
+      const galleryText = req.body['gallery-text'];
+      console.log('Gallery submission info is: ', galleryText);
+      const sql = `
     update "favorites"
       set "description" = $3
     where "userId" = $1 AND "artId" = $2
     returning *;
     `;
-    const params = [userId, artId, galleryText];
-    const result = await db.query(sql, params);
-    if (result.rowCount < 1) {
-      console.log(result);
-      throw new ClientError(404, `${artId} not in ${userId}'s favorites.`);
+      const params = [userId, artId, galleryText];
+      const result = await db.query(sql, params);
+      if (result.rowCount < 1) {
+        console.log(result);
+        throw new ClientError(404, `${artId} not in ${userId}'s favorites.`);
+      }
+      res.sendStatus(204);
+    } catch (err) {
+      next(err);
     }
-    res.sendStatus(204);
-  } catch (err) {
-    next(err);
   }
-});
+);
 
-app.delete('/api/gallery/:userId/:artId', async (req, res, next) => {
-  try {
-    const userId = Number(req.params.userId);
-    const artId = Number(req.params.artId);
-    if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
-      throw new ClientError(
-        404,
-        `Could not remove ${artId} from user ${userId}'s gallery due to bad request params.`
-      );
-    }
-    const sql = `update "favorites"
+app.delete(
+  '/api/gallery/:userId/:artId',
+  authorizationMiddleware,
+  async (req, res, next) => {
+    try {
+      const userId = Number(req.params.userId);
+      const artId = Number(req.params.artId);
+      if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
+        throw new ClientError(
+          404,
+          `Could not remove ${artId} from user ${userId}'s gallery due to bad request params.`
+        );
+      }
+      const sql = `update "favorites"
       set "description" = NULL
     where "userId" = $1 AND "artId" = $2
     returning *;
     `;
-    const params = [userId, artId];
-    const result = await db.query(sql, params);
-    if (result.rowCount < 1) {
-      console.log(result);
-      throw new ClientError(404, `${artId} not in ${userId}'s favorites.`);
+      const params = [userId, artId];
+      const result = await db.query(sql, params);
+      if (result.rowCount < 1) {
+        console.log(result);
+        throw new ClientError(404, `${artId} not in ${userId}'s favorites.`);
+      }
+      res.sendStatus(204);
+    } catch (err) {
+      next(err);
     }
-    res.sendStatus(204);
-  } catch (err) {
-    next(err);
   }
-});
+);
 
-app.get('/api/gallery/:userId', async (req, res, next) => {
-  try {
-    const userId = Number(req.params.userId);
-    if (!Number.isInteger(userId)) {
-      throw new ClientError(
-        404,
-        `Could not read user ${userId}'s gallery due to bad request params.`
-      );
-    }
-    const sql = `
+app.get(
+  '/api/gallery/:userId',
+  authorizationMiddleware,
+  async (req, res, next) => {
+    try {
+      const userId = Number(req.params.userId);
+      if (!Number.isInteger(userId)) {
+        throw new ClientError(
+          404,
+          `Could not read user ${userId}'s gallery due to bad request params.`
+        );
+      }
+      const sql = `
     select *
       from "favorites"
     where "userId" = $1 AND "description" IS NOT NULL
     `;
-    const params = [userId];
-    const result = await db.query(sql, params);
-    const rows = result.rows;
-    res.status(201).json(rows);
-  } catch (err) {
-    next(err);
+      const params = [userId];
+      const result = await db.query(sql, params);
+      const rows = result.rows;
+      res.status(201).json(rows);
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 /**
  * Serves React's index.html if no api route matches.

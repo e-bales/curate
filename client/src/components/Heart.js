@@ -1,15 +1,24 @@
 import './Heart.css';
 import { useState } from 'react';
-import { BsHeart, BsHeartFill } from 'react-icons/bs';
+import {
+  BsHeart,
+  BsHeartFill,
+  BsHeartbreak,
+  BsHeartbreakFill,
+} from 'react-icons/bs';
 
 export default function Heart({ artId, userId, userLiked }) {
   const [liked, setLiked] = useState(userLiked);
+  const [error, setError] = useState(false);
 
   async function sendServerLike() {
     try {
       console.log('Adding like to db?');
       const req = {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
       };
       const res = await fetch(`/api/favorites/add/${userId}/${artId}`, req);
       if (!res.ok) {
@@ -22,7 +31,7 @@ export default function Heart({ artId, userId, userLiked }) {
       sessionStorage.setItem('favorites', JSON.stringify(newFavorites));
     } catch (err) {
       console.log(err);
-      // throw new Error('Could not perform liking db call on this piece.');
+      throw new Error(err.message);
     }
   }
 
@@ -30,6 +39,9 @@ export default function Heart({ artId, userId, userLiked }) {
     try {
       const req = {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
       };
       const res = await fetch(`/api/favorites/delete/${userId}/${artId}`, req);
       if (!res.ok) {
@@ -45,19 +57,53 @@ export default function Heart({ artId, userId, userLiked }) {
       sessionStorage.setItem('favorites', JSON.stringify(array));
     } catch (err) {
       console.log(err);
+      throw new Error(err.message);
     }
   }
 
   async function likeHeart() {
-    console.log(`UserID: ${userId} liked art of ID ${artId}`);
-    await sendServerLike();
-    setLiked(true);
+    try {
+      console.log(`UserID: ${userId} liked art of ID ${artId}`);
+      await sendServerLike();
+      setLiked(true);
+    } catch (err) {
+      setError(true);
+    }
   }
 
   async function unLikeHeart() {
-    console.log(`UserID: ${userId} unliked art of ID ${artId}`);
-    await sendServerUnlike();
-    setLiked(false);
+    try {
+      console.log(`UserID: ${userId} unliked art of ID ${artId}`);
+      await sendServerUnlike();
+      setLiked(false);
+    } catch (err) {
+      setError(true);
+    }
+  }
+
+  if (error) {
+    if (liked) {
+      return (
+        <div className="heart-wrap-display hover-pointer liked">
+          <BsHeartbreakFill
+            onClick={() => {
+              alert('Unable to unlike artpiece at this time...');
+            }}
+            className="heart"
+          />
+        </div>
+      );
+    }
+    return (
+      <div className="heart-wrap-display hover-pointer unliked">
+        <BsHeartbreak
+          onClick={() => {
+            alert('Unable to like artpiece at this time...');
+          }}
+          className="heart"
+        />
+      </div>
+    );
   }
 
   if (liked) {

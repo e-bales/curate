@@ -6,6 +6,9 @@ import { useEffect, useState } from 'react';
 export default function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
+  const [searchError, setSearchError] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [followers, setFollowers] = useState([]);
 
   useEffect(() => {
@@ -24,6 +27,60 @@ export default function Profile() {
     const id = JSON.parse(sessionStorage.getItem('userObj')).user.userId;
     getFollowers(id);
   }, []);
+
+  async function handleSearch(event) {
+    event.preventDefault();
+    try {
+      setSearchLoading(true);
+      setSearchError(false);
+      setSearchResults([]);
+      const formData = new FormData(event.target);
+      const userData = Object.fromEntries(formData.entries());
+      const search = userData.search;
+      if (search.split(' ').length > 1 || search.length < 3) {
+        throw new Error(' : Invalid search parameters');
+      }
+      const userId = JSON.parse(sessionStorage.getItem('userObj'))?.user.userId;
+      const req = {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+      };
+      const result = await getSearchData(req, userId, userData.search);
+      // console.log('result is: ', result);
+      setSearchResults(result);
+    } catch (err) {
+      setSearchError(err);
+    } finally {
+      setSearchLoading(false);
+    }
+  }
+
+  async function unFollowUser(requestedId) {
+    try {
+      const userId = JSON.parse(sessionStorage.getItem('userObj'))?.user.userId;
+      console.log(
+        `User ${userId} is attempting to unfollow user ${requestedId}`
+      );
+      const req = {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+      };
+      const result = await fetch(
+        `/api/followers/delete/${userId}/${requestedId}`,
+        req
+      );
+      setFollowers((prev) => {
+        return prev.filter((element) => element.id !== requestedId);
+      });
+      console.log(result);
+    } catch (err) {
+      setSearchError(err);
+    }
+  }
 
   if (isLoading) return <LoadingModal />;
   if (error) {
@@ -49,11 +106,39 @@ export default function Profile() {
       <div className="profile-row">
         <div className="profile-column left">
           <div className="curators-title-wrap">
-            <h2 className="curators-title">Curators you follow</h2>
+            <h2 className="curators-title">Find other Curators!</h2>
           </div>
-          <div className="search-wrap"></div>
-          <div className="search-results"></div>
-          <div className="follower-list"></div>
+          <SearchBar onSubmit={handleSearch} />
+          <div className="search-error">
+            {searchError &&
+              'Your search must be one word and over two characters long.'}
+          </div>
+          <div className="search-results">
+            {searchLoading && <LoadingModal />}
+            {searchResults.map((element) => (
+              <div key={element.userId} className="user-wrap">
+                <UserResult
+                  user={element}
+                  setFollowers={setFollowers}
+                  followers={followers}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="follower-list">
+            <div className="followers-title">
+              <h3>Curators you follow:</h3>
+            </div>
+            {followers.map((element, index) => (
+              <div className="follower-list-wrap">
+                <UserFollower
+                  key={index}
+                  followedUser={element}
+                  onClick={() => unFollowUser(element.id)}
+                />
+              </div>
+            ))}
+          </div>
         </div>
         <div className="profile-column right">
           <div className="profile-button-wrap">
@@ -105,4 +190,104 @@ async function requestFollowers(userId) {
       `Could not RETRIEVE followers for ${userId}...: ${err.message}`
     );
   }
+}
+
+async function getSearchData(req, userId, search) {
+  try {
+    console.log('Req is: ', req);
+    const res = await fetch(`/api/user/search/${userId}/${search}`, req);
+    if (!res.ok) {
+      throw new Error('Could not retrieve users of that search...');
+    }
+    const data = await res.json();
+    return data;
+  } catch {
+    throw new Error('Could not retrieve search data...');
+  }
+}
+
+function SearchBar({ onSubmit }) {
+  return (
+    <div className="search-bar-wrap">
+      <form onSubmit={(event) => onSubmit(event)}>
+        <input
+          type="text"
+          className="search-bar"
+          name="search"
+          autoComplete="off"
+          placeholder="Search for fellow curators..."></input>
+      </form>
+    </div>
+  );
+}
+
+function UserResult({ user, setFollowers, followers }) {
+  const [followed, setFollowed] = useState(false);
+
+  for (let i = 0; i < followers.length; i++) {
+    if (user.userId === followers[i].id) {
+      return;
+    }
+  }
+
+  async function followUser() {
+    try {
+      const req = {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        },
+      };
+      const currId = JSON.parse(sessionStorage.getItem('userObj'))?.user.userId;
+      const requestId = user.userId;
+      console.log(`User ${currId} is attempting to follow ${requestId}`);
+      const res = await fetch(`/api/followers/add/${currId}/${requestId}`, req);
+      if (!res.ok) {
+        throw new Error('Could not add to followers');
+      }
+      setFollowed(true);
+      // const newFollowersArray = followers.concat([user]);
+      setFollowers((prev) => {
+        return prev.concat([user]);
+      });
+    } catch (err) {
+      alert('Could not follow user, please try again later.');
+    }
+  }
+
+  return (
+    <div className="user-result-wrap">
+      <div className="user-name-wrap">
+        <h3 className="user-name belleza-font">{user.username}</h3>
+      </div>
+      <div className="follow-button-wrap">
+        <button
+          onClick={() => followUser()}
+          type="button"
+          disabled={followed}
+          className={`follow-button belleza-font ${
+            followed ? 'followed' : 'hover-pointer'
+          }`}>
+          Follow
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function UserFollower({ followedUser, onClick }) {
+  return (
+    <div className="followed-user-wrap">
+      <div className="user-column">
+        <Link to={`/gallery/${followedUser.id}`} className="follower-link">
+          <h3 className="followed-user-name">{followedUser.username}</h3>
+        </Link>
+      </div>
+      <div className="user-column profile-right">
+        <div className="unfollow hover-pointer">
+          <h3 onClick={() => onClick()}>Unfollow</h3>
+        </div>
+      </div>
+    </div>
+  );
 }
