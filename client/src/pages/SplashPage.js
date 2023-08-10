@@ -1,13 +1,12 @@
 import './SplashPage.css';
 import { useState, useEffect } from 'react';
 import LoadingModal from '../components/LoadingModal';
-import Heart from '../components/Heart';
 import { useNavigate } from 'react-router-dom';
 import {
   BsFillArrowLeftCircleFill,
   BsFillArrowRightCircleFill,
-  BsHeart,
 } from 'react-icons/bs';
+import holderImage from '../default-product-img.jpg';
 
 export default function SplashPage({ loggedIn, imageSet }) {
   const [index, setIndex] = useState(0);
@@ -21,7 +20,6 @@ export default function SplashPage({ loggedIn, imageSet }) {
         setIsLoading(true);
         const data = await fetch('/api/museum/random');
         const images = await data.json();
-        console.log('Returned images is: ', images);
         setRandomImages(images);
       } catch (err) {
         setError(err);
@@ -41,6 +39,7 @@ export default function SplashPage({ loggedIn, imageSet }) {
   }
 
   if (isLoading) return <LoadingModal />;
+  if (error) return <div className="standard-error">{error.message}</div>;
 
   return (
     <div className="splash-page">
@@ -52,10 +51,6 @@ export default function SplashPage({ loggedIn, imageSet }) {
               className="arrow"
             />
           </div>
-          {/* <div className="img-wrap">
-            {loggedIn && <SplashHeart />}
-            <img src={randomImages[index].imageUrl} alt="splash-page art" />
-          </div> */}
           <SplashArt artObj={randomImages[index]} loggedIn={loggedIn} />
           <div className="arrow-wrap">
             <BsFillArrowRightCircleFill
@@ -69,16 +64,7 @@ export default function SplashPage({ loggedIn, imageSet }) {
   );
 }
 
-function SplashHeart({ onClick }) {
-  return (
-    <div className="heart-wrap hover-pointer">
-      <BsHeart className="heart" />
-    </div>
-  );
-}
-
 function customModulo(n, m) {
-  // used because Javascript doesn't handle negative modulo 'correctly'.
   return ((n % m) + m) % m;
 }
 
@@ -87,25 +73,13 @@ function SplashArt({ artObj, loggedIn }) {
 
   return (
     <div className="img-wrap">
-      {loggedIn && (
-        <div className="splash-heart-wrap">
-          {' '}
-          <Heart
-            artId={artObj.id}
-            userId={JSON.parse(localStorage.getItem('userObj'))?.user.userId}
-            userLiked={
-              JSON.parse(localStorage.getItem('favorites'))
-                ? JSON.parse(localStorage.getItem('favorites')).includes(
-                    artObj.id
-                  )
-                : false
-            }
-          />
-        </div>
-      )}
       <img
-        onClick={() => navigate(`/object/${artObj.id}`)}
-        src={artObj.imageUrl}
+        onClick={
+          artObj?.id
+            ? () => navigate(`/object/${artObj?.id}`)
+            : () => alert('Unknown Image Link')
+        }
+        src={artObj?.imageUrl ? artObj?.imageUrl : holderImage}
         className={`splash-image ${loggedIn && 'hover-pointer'}`}
         alt="splash-page art"
       />

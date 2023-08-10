@@ -15,7 +15,6 @@ export default function SignIn({ subtextOnClick }) {
     try {
       const formData = new FormData(event.target);
       const userData = Object.fromEntries(formData.entries());
-      console.log(userData);
       if (userData.password !== userData.matchingPassword) {
         setSamePW(false);
       } else {
@@ -33,7 +32,6 @@ export default function SignIn({ subtextOnClick }) {
           throw new Error(`fetch Error ${res.status}`);
         }
         await delay(1500);
-        const user = await res.json();
         setIsRegistered(true);
       }
     } catch (err) {

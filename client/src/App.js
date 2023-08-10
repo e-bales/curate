@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-// import logo from './logo.svg';
 import art from './san-giorgio-maggiore-at-dusk.jpg';
 import art2 from './christ-with-angels.jpg';
 import artLarge from './Large-Test-img.jpg';
@@ -50,25 +49,10 @@ function App() {
       setLoggedIn(true);
     }
   }, []);
-  // const [serverData, setServerData] = useState('');
-
-  // useEffect(() => {
-  //   async function readServerData() {
-  //     const resp = await fetch('/api/hello');
-  //     const data = await resp.json();
-
-  //     console.log('Data from server:', data);
-
-  //     setServerData(data.message);
-  //   }
-
-  //   readServerData();
-  // }, []);
 
   return (
     <div className="app">
       {grayOut && <GrayOut onClick={() => closeModal()} />}
-      {/* {loggingIn === undefined ? '' : loggingIn === null ? <SignUp /> : loggingIn ? <SignIn /> : ''} */}
       {loggingIn === 'login' ? (
         <SignIn
           subtextOnClick={() => setLoggingIn('signup')}
@@ -115,17 +99,6 @@ function App() {
         </Route>
       </Routes>
     </div>
-
-    // <NavBar loggedIn={loggedIn} />
-    // <SplashPage loggedIn={loggedIn} imageSet={images} />
-
-    // <div className="App">
-    //   <NavBar />
-    //   <header className="App-header">
-    //     <img src={logo} className="App-logo" alt="logo" />
-    //     <h1>{serverData}</h1>
-    //   </header>
-    // </div>
   );
 }
 

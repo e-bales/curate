@@ -26,14 +26,10 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
         throw new Error(`fetch Error ${res.status}`);
       }
       const { user, token } = await res.json();
-      console.log('User is: ', user);
       const favorites = await fetch(`/api/favorites/${user.userId}`);
       const favoritesJSON = await favorites.json();
       localStorage.setItem('favorites', JSON.stringify(favoritesJSON));
-      // console.log('User is: ', user);
-      // console.log('token is: ', token);
       const userObj = { user };
-      // console.dir(userObj);
       localStorage.setItem('userObj', JSON.stringify(userObj));
       localStorage.setItem('token', token);
       delay(1500);
@@ -95,6 +91,32 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
               <p onClick={() => subtextOnClick()} className="sign-up">
                 Sign Up
               </p>
+            </div>
+            <div className="subtext login-row">
+              <div className="guest-form">
+                <form onSubmit={handleSubmit}>
+                  <div className="invisible">
+                    <input
+                      name="username"
+                      type="text"
+                      readOnly
+                      value="GuestAccount"
+                    />
+                    <input
+                      name="password"
+                      type="password"
+                      readOnly
+                      value="guestPasswordn7123"
+                    />
+                  </div>
+                  <button
+                    disabled={isLoading}
+                    type="submit"
+                    className="guest-login bebas-font hover-pointer">
+                    Guest Login
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         </div>

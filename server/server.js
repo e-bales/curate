@@ -26,15 +26,15 @@ app.use(express.static(reactStaticDir));
 app.use(express.static(uploadsStaticDir));
 app.use(express.json());
 
-// app.get('/api/hello', (req, res) => {
-//   res.json({ message: 'Boom POW!' });
-// });
-
+/**
+ *
+ * @param {string} url
+ * @returns json'ed museum api response
+ */
 async function getMuseumData(url) {
   try {
     const response = await fetch(url);
     if (!response.ok) {
-      console.log(response);
       throw new Error('Unable to retrieve data...');
     }
     const data = await response.json();
@@ -44,6 +44,10 @@ async function getMuseumData(url) {
   }
 }
 
+/**
+ * Sign-up endpoint. Attempts to add user to the db. Will throw an error
+ * if the username already exists.
+ */
 app.post('/api/auth/sign-up', async (req, res, next) => {
   try {
     const { username, password } = req.body;
@@ -75,6 +79,10 @@ app.post('/api/auth/sign-up', async (req, res, next) => {
   }
 });
 
+/**
+ * Sign-In endpoint. Will throw an error if the provided username and password
+ * do not match enything in our db.
+ */
 app.post('/api/auth/sign-in', async (req, res, next) => {
   try {
     const { username, password } = req.body;
@@ -104,6 +112,10 @@ app.post('/api/auth/sign-in', async (req, res, next) => {
   }
 });
 
+/**
+ * User delete end-point. CURRENTLY not reachable client-side. Only for
+ * development purposes only.
+ */
 app.delete('/api/auth/:userId', async (req, res, next) => {
   try {
     const deleteId = Number(req.params.userId);
@@ -127,6 +139,9 @@ app.delete('/api/auth/:userId', async (req, res, next) => {
   }
 });
 
+/**
+ * Endpoint that retrieves a username given a userId.
+ */
 app.get('/api/db/:userId', async (req, res, next) => {
   try {
     const userId = Number(req.params.userId);
@@ -141,7 +156,6 @@ app.get('/api/db/:userId', async (req, res, next) => {
     const params = [userId];
     const result = await db.query(sql, params);
     const [user] = result.rows;
-    // console.log('Db user is: ', user);
     if (!user) {
       throw new ClientError(404, 'Could not find the requested user.');
     }
@@ -152,29 +166,10 @@ app.get('/api/db/:userId', async (req, res, next) => {
 });
 
 /**
- * Loads all the data server side, so we don't have to re-query the api multiple times.
+ * Endpoint for the homepage, retrieves 6 random images to display.
  */
-// app.get('/api/museum/:departmentId', async (req, res, next) => {
-//   try {
-//     console.log('Attempting to cache data...');
-//     const id = Number(req.params.departmentId);
-//     if (!Number.isInteger(id)) {
-//       throw new ClientError(400, 'not a valid Id');
-//     }
-//     const url = `https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=${id}&q=painting&hasImage=true`;
-//     const data = await getMuseumData(url);
-//     currentDataRequest = data;
-//     console.log(`Data cached as ${currentDataRequest}`);
-//     console.log(currentDataRequest);
-//     res.sendStatus(204);
-//   } catch (err) {
-//     next(err);
-//   }
-// });
-
 app.get('/api/museum/random', async (req, res, next) => {
   try {
-    console.log('Attempting to pull random data...');
     const url =
       'https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=11&q=painting&hasImage=true';
     let data = await getMuseumData(url);
@@ -211,14 +206,13 @@ app.get('/api/museum/random', async (req, res, next) => {
 });
 
 /**
- * Retrieves the the 'page'th 10 art objectID's
+ * Endpoint for MultiDisplay. Retrieves the the 'page'th 10 art objectID's.
  */
 app.get(
   '/api/museum/department/:departmentId/:page',
   authorizationMiddleware,
   async (req, res, next) => {
     try {
-      console.log('Attempting to pull multi-data...');
       const id = Number(req.params.departmentId);
       const page = Number(req.params.page);
       if (!Number.isInteger(page) || !Number.isInteger(id)) {
@@ -229,11 +223,9 @@ app.get(
       const data = await getMuseumData(url);
       const retrievedData = data.objectIDs.slice((page - 1) * 10, page * 10);
       let moreData = true;
-      // console.log('Next spot = :', data.objectIDs[page * 10]);
       if (!data.objectIDs[page * 10]) {
         moreData = false;
       }
-      // console.log('retrieved data: ', retrievedData);
       if (retrievedData.length === 0) {
         throw new ClientError(404, 'No art pieces found of that specification');
       }
@@ -250,14 +242,12 @@ app.get(
           init
         );
         const json = await art.json();
-        // console.log('json: ', json);
         artData.push(json);
       }
       const returningData = {
         data: artData,
         more: moreData,
       };
-      // console.log('Final objects: ', artData);
       res.status(201).json(returningData);
     } catch (err) {
       next(err);
@@ -265,17 +255,19 @@ app.get(
   }
 );
 
+/**
+ * Endpoint for retrieving object's actual information from the MET api. Used
+ * in many places, including SingleDisplay.
+ */
 app.get(
   '/api/museum/object/:objectId',
   authorizationMiddleware,
   async (req, res, next) => {
     try {
-      console.log('Attempting to pull single data...');
       const id = Number(req.params.objectId);
       if (!Number.isInteger(id)) {
         throw new ClientError(400, 'not a valid address');
       }
-      console.log(`Getting data for id: ${id}`);
       const url = `https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`;
       const data = await getMuseumData(url);
       res.status(201).json(data);
@@ -285,12 +277,14 @@ app.get(
   }
 );
 
+/**
+ * Endpoint for when a user unfavorites a piece of art. Connect to the Heart component.
+ */
 app.delete(
   '/api/favorites/delete/:userId/:objectId',
   authorizationMiddleware,
   async (req, res, next) => {
     try {
-      console.log('Attempting to delete favorited image...');
       const userId = Number(req.params.userId);
       const artId = Number(req.params.objectId);
       const sql = `
@@ -307,7 +301,6 @@ app.delete(
           `Could not delete ${artId} from user ${userId}'s favorites.`
         );
       }
-      console.log(result);
       res.sendStatus(204);
     } catch (err) {
       next(err);
@@ -315,12 +308,14 @@ app.delete(
   }
 );
 
+/**
+ * Endpoint for adding an object to a user's favorites. Connected to the Heart Component.
+ */
 app.post(
   '/api/favorites/add/:userId/:objectId',
   authorizationMiddleware,
   async (req, res, next) => {
     try {
-      console.log('Attempting to add favorited image...');
       const userId = Number(req.params.userId);
       const artId = Number(req.params.objectId);
       if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
@@ -349,6 +344,10 @@ app.post(
   }
 );
 
+/**
+ * Endpoint for retrieving and displaying the user's Favorites page. Pagination
+ * is included in this endpoint, given a page number.
+ */
 app.get(
   '/api/favorites/:userId/:page',
   authorizationMiddleware,
@@ -356,7 +355,6 @@ app.get(
     try {
       const userId = Number(req.params.userId);
       const page = Number(req.params.page);
-      console.log(`Retrieving favorites, page: ${page}, for ${userId}`);
       const sql = `
     select "artId",
            "description"
@@ -368,19 +366,16 @@ app.get(
       const result = await db.query(sql, params);
       const rows = result.rows;
       let moreData = true;
-      // console.log('Next spot = :', data.objectIDs[page * 10]);
       if (!rows[page * 10]) {
         moreData = false;
       }
       let data = [];
       if (rows.length > 0) {
         const slicedRows = rows.slice((page - 1) * 10, page * 10);
-        // console.log('slicedRows: ', slicedRows);
         const newRows = slicedRows.map((element) => ({
           artId: element.artId,
           isGallery: element.description !== null,
         }));
-        // console.log('newRows: ', newRows);
         data = newRows;
       }
       const init = {
@@ -397,7 +392,6 @@ app.get(
         );
         const json = await art.json();
         json.isGallery = data[i].isGallery;
-        // console.log('json: ', json);
         artData.push(json);
       }
 
@@ -408,7 +402,6 @@ app.get(
     `;
       const totalResult = await db.query(sqlCount, params);
       const total = totalResult.rows[0]?.totalGallery;
-      console.log('Total is: ', total);
 
       const returningData = {
         data: artData,
@@ -423,11 +416,13 @@ app.get(
   }
 );
 
-// Just gets the id's for localStorage, not retrieving api data
+/**
+ * Endpoint for retrieving JUST the art ID's for localStorage. Does NOT retrieve
+ * and of the actual information about the art pieces.
+ */
 app.get('/api/favorites/:userId', async (req, res, next) => {
   try {
     const userId = Number(req.params.userId);
-    console.log(`Retrieving all favorites for ${userId}`);
     const sql = `
     select "artId"
       from "favorites"
@@ -437,37 +432,29 @@ app.get('/api/favorites/:userId', async (req, res, next) => {
     const result = await db.query(sql, params);
     const rows = result.rows;
     const newRows = rows.map((element) => element.artId);
-    // console.log('newRows is: ', newRows);
     res.status(201).json(newRows);
   } catch (err) {
     next(err);
   }
 });
 
+/**
+ * Endpoint for retrieving all the user's that userId follows
+ */
 app.get(
   '/api/followers/:userId',
   authorizationMiddleware,
   async (req, res, next) => {
     try {
       const userId = Number(req.params.userId);
-      console.log(`Retrieving followers for ${userId}`);
-      // const sql = `
-      //   select "f"."followedUserId",
-      //          "u"."username"
-      //     from "followers" as "f"
-      //   join "users" as "u" using ("userId")
-      //   where "userId" = $1
-      // `;
       const sql = `
         select "followedUserId"
           from "followers"
         where "userId" = $1
         `;
-      // NEED TO WRITE A JOIN!
       const params = [userId];
       const result = await db.query(sql, params);
       const rows = result.rows;
-      console.log('Rows is: ', rows);
       const newRows = [];
       for (let i = 0; i < rows.length; i++) {
         const usernameSql = `
@@ -484,24 +471,20 @@ app.get(
         newRows.push(newObj);
       }
       res.status(201).json(newRows);
-
-      // if (rows.length > 0) {
-      //   const newRows = rows.map((element) => element.artId);
-      //   res.status(201).json(newRows);
-      // } else {
-      //   res.status(201).json([]);
-      // }
     } catch (err) {
       next(err);
     }
   }
 );
 
+/**
+ * Endpoint for when the user searches for other user's on their Profile page.
+ * Ensures that the user's own name does not appear.
+ */
 app.get('/api/user/search/:userId/:search', async (req, res, next) => {
   try {
     const search = req.params.search;
     const userId = Number(req.params.userId);
-    console.log(`User ${userId} is searching for ${search}...`);
     const sql = `
       select "username",
              "userId"
@@ -517,6 +500,9 @@ app.get('/api/user/search/:userId/:search', async (req, res, next) => {
   }
 });
 
+/**
+ * Endpoint for when the user wants to follow another user.
+ */
 app.post('/api/followers/add/:userId/:requestId', async (req, res, next) => {
   try {
     const userId = Number(req.params.userId);
@@ -527,7 +513,6 @@ app.post('/api/followers/add/:userId/:requestId', async (req, res, next) => {
         `Could not add ${requestId} to user ${userId}'s followed list.`
       );
     }
-    console.log(`Attempting to send follower request to db`);
     const sql = `
     insert into "followers" ("userId", "followedUserId")
     values ($1, $2)
@@ -547,6 +532,9 @@ app.post('/api/followers/add/:userId/:requestId', async (req, res, next) => {
   }
 });
 
+/**
+ * Endpoint for when the user removes another user from their follow list.
+ */
 app.delete(
   '/api/followers/delete/:userId/:requestId',
   async (req, res, next) => {
@@ -559,7 +547,6 @@ app.delete(
           `Could not add ${requestId} to user ${userId}'s followed list.`
         );
       }
-      console.log(`Attempting to send follower DELETE request to db`);
       const sql = `
     delete
       from "followers"
@@ -581,6 +568,9 @@ app.delete(
   }
 );
 
+/**
+ * Endpoint for when the user wants to add an art-piece to their Gallery.
+ */
 app.post(
   '/api/gallery/:userId/:artId',
   authorizationMiddleware,
@@ -588,8 +578,6 @@ app.post(
     try {
       const userId = Number(req.params.userId);
       const artId = Number(req.params.artId);
-      console.log('userID: ', userId);
-      console.log('artId: ', artId);
       if (!Number.isInteger(userId) || !Number.isInteger(artId)) {
         throw new ClientError(
           404,
@@ -597,7 +585,6 @@ app.post(
         );
       }
       const galleryText = req.body['gallery-text'];
-      console.log('Gallery submission info is: ', galleryText);
       const sql = `
     update "favorites"
       set "description" = $3
@@ -607,7 +594,6 @@ app.post(
       const params = [userId, artId, galleryText];
       const result = await db.query(sql, params);
       if (result.rowCount < 1) {
-        console.log(result);
         throw new ClientError(404, `${artId} not in ${userId}'s favorites.`);
       }
       res.sendStatus(204);
@@ -617,6 +603,9 @@ app.post(
   }
 );
 
+/**
+ * Endpoint for when the user wants to delete a piece from their Gallery.
+ */
 app.delete(
   '/api/gallery/:userId/:artId',
   authorizationMiddleware,
@@ -638,7 +627,6 @@ app.delete(
       const params = [userId, artId];
       const result = await db.query(sql, params);
       if (result.rowCount < 1) {
-        console.log(result);
         throw new ClientError(404, `${artId} not in ${userId}'s favorites.`);
       }
       res.sendStatus(204);
@@ -648,6 +636,9 @@ app.delete(
   }
 );
 
+/**
+ * Endpoint for retrieving the art Id's and the user's critiques for a Gallery.
+ */
 app.get(
   '/api/gallery/:userId',
   authorizationMiddleware,

@@ -1,6 +1,6 @@
 import './Profile.css';
 import LoadingModal from '../components/LoadingModal';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 export default function Profile() {
@@ -14,9 +14,7 @@ export default function Profile() {
   useEffect(() => {
     async function getFollowers(userId) {
       try {
-        console.log('Requesting to retrieve followers...');
         const data = await requestFollowers(userId);
-        console.log('Followers retrieved as: ', data);
         setFollowers(data);
       } catch (err) {
         setError(err);
@@ -48,7 +46,6 @@ export default function Profile() {
         },
       };
       const result = await getSearchData(req, userId, userData.search);
-      // console.log('result is: ', result);
       setSearchResults(result);
     } catch (err) {
       setSearchError(err);
@@ -60,23 +57,16 @@ export default function Profile() {
   async function unFollowUser(requestedId) {
     try {
       const userId = JSON.parse(localStorage.getItem('userObj'))?.user.userId;
-      console.log(
-        `User ${userId} is attempting to unfollow user ${requestedId}`
-      );
       const req = {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       };
-      const result = await fetch(
-        `/api/followers/delete/${userId}/${requestedId}`,
-        req
-      );
+      await fetch(`/api/followers/delete/${userId}/${requestedId}`, req);
       setFollowers((prev) => {
         return prev.filter((element) => element.userId !== requestedId);
       });
-      console.log(result);
     } catch (err) {
       setSearchError(err);
     }
@@ -93,7 +83,7 @@ export default function Profile() {
         </div>
       );
     }
-    return <div>{error.message}</div>;
+    return <div className="standard-error">{error.message}</div>;
   }
 
   return (
@@ -194,7 +184,6 @@ async function requestFollowers(userId) {
 
 async function getSearchData(req, userId, search) {
   try {
-    console.log('Req is: ', req);
     const res = await fetch(`/api/user/search/${userId}/${search}`, req);
     if (!res.ok) {
       throw new Error('Could not retrieve users of that search...');
@@ -240,13 +229,11 @@ function UserResult({ user, setFollowers, followers }) {
       };
       const currId = JSON.parse(localStorage.getItem('userObj'))?.user.userId;
       const requestId = user.userId;
-      console.log(`User ${currId} is attempting to follow ${requestId}`);
       const res = await fetch(`/api/followers/add/${currId}/${requestId}`, req);
       if (!res.ok) {
         throw new Error('Could not add to followers');
       }
       setFollowed(true);
-      // const newFollowersArray = followers.concat([user]);
       setFollowers((prev) => {
         return prev.concat([user]);
       });
@@ -276,7 +263,6 @@ function UserResult({ user, setFollowers, followers }) {
 }
 
 function UserFollower({ followedUser, onClick }) {
-  console.log('User created with: ', followedUser);
   return (
     <div className="followed-user-wrap">
       <div className="user-column">
