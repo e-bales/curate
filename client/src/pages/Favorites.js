@@ -21,14 +21,12 @@ export default function Favorites() {
      */
     async function getFirstData() {
       try {
-        console.log('Requesting to retrieve first 10 favorites...');
         const id = JSON.parse(localStorage.getItem('userObj'))?.user.userId;
         if (!id) {
           throw new Error(' : Please log in to access this page.');
         }
         const data = await getFavoritesData(id, page);
         setGalleryMax(data.galleryFull);
-        console.log('Gallery Max is: ', data.galleryFull);
         setMoreData(data.more);
         setRequestedArt(data.data);
       } catch (err) {
@@ -52,7 +50,7 @@ export default function Favorites() {
         </div>
       );
     }
-    return <div>{error.message}</div>;
+    return <div className="standard-error">{error.message}</div>;
   }
 
   return (
@@ -94,23 +92,6 @@ export default function Favorites() {
   );
 }
 
-// async function getArtData(id) {
-//   try {
-//     const req = {
-//       method: 'GET',
-//     };
-//     console.log('Attempting to connect to server to cache...');
-//     const res = await fetch(`/api/museum/${id}`, req);
-//     if (!res.ok) {
-//       throw new Error(`fetch Error ${res.status}`);
-//     }
-//     // const data = res.json();
-//     // return data;
-//   } catch (err) {
-//     throw new Error(`Could not store department data...: ${err.message}`);
-//   }
-// }
-
 async function getFavoritesData(id, page) {
   try {
     const req = {
@@ -121,9 +102,6 @@ async function getFavoritesData(id, page) {
     };
     const res = await fetch(`/api/favorites/${id}/${page}`, req);
     if (!res.ok) {
-      // console.log('Res: ', res);
-      // const msg = await res.json();
-      // console.log(res.status);
       if (res.status === 401) {
         throw new Error('Please log in to access this page.');
       }
@@ -132,13 +110,11 @@ async function getFavoritesData(id, page) {
     const data = await res.json();
     return data;
   } catch (err) {
-    console.log(err);
     throw new Error(`Could not RETRIEVE department data...: ${err.message}`);
   }
 }
 
 function FavoritesDisplay({ art, galleryMax }) {
-  // art = art.art;
   if (art.message === 'Not a valid object') {
     return;
   }
@@ -206,16 +182,7 @@ function FavoritesDisplay({ art, galleryMax }) {
   );
 }
 
-// function SplashHeart({ onClick }) {
-//   return (
-//     <div className="heart-wrap-display hover-pointer">
-//       <BsHeart onClick={() => onClick()} className="heart" />
-//     </div>
-//   );
-// }
-
 function FavoritesLink({ page, left, moreData, onClick }) {
-  // const length = dataArray?.length;
   if (left) {
     return (
       <BsArrowBarLeft

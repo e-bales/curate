@@ -90,3 +90,14 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+.guest-login {
+  border: none;
+  background: #f9f9f9;
+  text-decoration: underline;
+  padding-bottom: 1rem;
+}
+
+.invisible {
+  display: none;
+}

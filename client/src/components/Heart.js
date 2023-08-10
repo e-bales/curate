@@ -13,7 +13,6 @@ export default function Heart({ artId, userId, userLiked }) {
 
   async function sendServerLike() {
     try {
-      console.log('Adding like to db?');
       const req = {
         method: 'POST',
         headers: {
@@ -22,15 +21,12 @@ export default function Heart({ artId, userId, userLiked }) {
       };
       const res = await fetch(`/api/favorites/add/${userId}/${artId}`, req);
       if (!res.ok) {
-        throw new Error(
-          `Could not add favorite for user: ${userId} and artId: ${artId}`
-        );
+        throw new Error('Could not add to your favorites.');
       }
       const array = JSON.parse(localStorage.getItem('favorites'));
       const newFavorites = array.concat([artId]);
       localStorage.setItem('favorites', JSON.stringify(newFavorites));
     } catch (err) {
-      console.log(err);
       throw new Error(err.message);
     }
   }
@@ -45,9 +41,7 @@ export default function Heart({ artId, userId, userLiked }) {
       };
       const res = await fetch(`/api/favorites/delete/${userId}/${artId}`, req);
       if (!res.ok) {
-        throw new Error(
-          `Could not delete favorite for user: ${userId} and artId: ${artId}`
-        );
+        throw new Error('Could not remove from your favorites.');
       }
       const array = JSON.parse(localStorage.getItem('favorites'));
       const index = array.indexOf(artId);
@@ -56,28 +50,25 @@ export default function Heart({ artId, userId, userLiked }) {
       }
       localStorage.setItem('favorites', JSON.stringify(array));
     } catch (err) {
-      console.log(err);
       throw new Error(err.message);
     }
   }
 
   async function likeHeart() {
     try {
-      console.log(`UserID: ${userId} liked art of ID ${artId}`);
       await sendServerLike();
       setLiked(true);
     } catch (err) {
-      setError(true);
+      setError(err);
     }
   }
 
   async function unLikeHeart() {
     try {
-      console.log(`UserID: ${userId} unliked art of ID ${artId}`);
       await sendServerUnlike();
       setLiked(false);
     } catch (err) {
-      setError(true);
+      setError(err);
     }
   }
 
@@ -87,7 +78,7 @@ export default function Heart({ artId, userId, userLiked }) {
         <div className="heart-wrap-display hover-pointer liked">
           <BsHeartbreakFill
             onClick={() => {
-              alert('Unable to unlike artpiece at this time...');
+              alert(error.message);
             }}
             className="heart"
           />
@@ -98,7 +89,7 @@ export default function Heart({ artId, userId, userLiked }) {
       <div className="heart-wrap-display hover-pointer unliked">
         <BsHeartbreak
           onClick={() => {
-            alert('Unable to like artpiece at this time...');
+            alert(error.message);
           }}
           className="heart"
         />
@@ -110,8 +101,8 @@ export default function Heart({ artId, userId, userLiked }) {
     return (
       <div className="heart-wrap-display hover-pointer liked">
         <BsHeartFill
-          onClick={async () => {
-            await unLikeHeart();
+          onClick={() => {
+            unLikeHeart();
           }}
           className="heart"
         />
@@ -121,8 +112,8 @@ export default function Heart({ artId, userId, userLiked }) {
     return (
       <div className="heart-wrap-display hover-pointer unliked">
         <BsHeart
-          onClick={async () => {
-            await likeHeart();
+          onClick={() => {
+            likeHeart();
           }}
           className="heart"
         />

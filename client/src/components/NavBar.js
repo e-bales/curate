@@ -5,7 +5,7 @@ import { FaPalette, FaBars } from 'react-icons/fa';
 
 export default function NavBar({ loggedIn, logInOnClick, search, logOut }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  // const [userLoggedIn, setUserLoggedIn] = useState(loggedIn);
+
   const link = [
     { name: 'Profile', link: '/profile', onClick: closeDrawer },
     { name: 'View by Department', link: '/department', onClick: closeDrawer },
@@ -22,19 +22,12 @@ export default function NavBar({ loggedIn, logInOnClick, search, logOut }) {
     localStorage.removeItem('favorites');
     if (localStorage.getItem('editData')) localStorage.removeItem('editData');
     logOut();
-    // setUserLoggedIn(false);
     closeDrawer();
   }
-  console.log('User logged in is: ', loggedIn);
 
   return (
     <div>
-      <Drawer
-        viewed={drawerOpen}
-        loggedIn={loggedIn}
-        drawerLinks={link}
-        // onClick={() => closeDrawer()}
-      />
+      <Drawer viewed={drawerOpen} loggedIn={loggedIn} drawerLinks={link} />
       <header className="nav-bar-wrap">
         <FaBars
           className="bars hover-pointer"
@@ -46,7 +39,6 @@ export default function NavBar({ loggedIn, logInOnClick, search, logOut }) {
             <Link to="/" className="title-text hover-pointer">
               Curate.
             </Link>
-            {/* <p className="title-text">Curate.</p> */}
           </div>
           <div className="col-half right">
             {loggedIn ? (
@@ -62,9 +54,6 @@ export default function NavBar({ loggedIn, logInOnClick, search, logOut }) {
                 Sign-In
               </p>
             )}
-            {/* <p className="title-text small-text">
-            {loggedIn ? 'Profile' : 'Sign-In'}
-          </p> */}
           </div>
         </div>
       </header>
@@ -92,13 +81,6 @@ function Drawer({ viewed, loggedIn, drawerLinks }) {
           ) : (
             <p>Sign In and become your own Curator to continue!</p>
           )}
-          {/* {drawerLinks.map((element, index) => (
-            <MenuItem
-              onClick={onClick}
-              key={index}
-              menuItem={element}
-            />
-          ))} */}
         </div>
         <div className="close">
           <p className="hover-pointer" onClick={() => drawerLinks[0].onClick()}>

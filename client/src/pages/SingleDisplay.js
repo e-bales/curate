@@ -2,7 +2,8 @@ import './SingleDisplay.css';
 import LoadingModal from '../components/LoadingModal';
 import { useEffect, useState } from 'react';
 import Heart from '../components/Heart';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import holderImage from '../default-product-img.jpg';
 
 export default function SingleDisplay() {
   const { objectId } = useParams();
@@ -13,9 +14,7 @@ export default function SingleDisplay() {
   useEffect(() => {
     async function getData() {
       try {
-        console.log('Requesting to retrieve art piece...');
         const data = await getArt(objectId);
-        console.log('Single art piece retreived as: ', data);
         setArtData(data);
       } catch (err) {
         setError(err);
@@ -49,7 +48,7 @@ export default function SingleDisplay() {
             <div className="sg-img-wrap">
               <img
                 className="sg-art"
-                src={artData.primaryImage}
+                src={artData.primaryImage ? artData.primaryImage : holderImage}
                 alt={artData.title}
               />
             </div>
@@ -61,12 +60,14 @@ export default function SingleDisplay() {
                 : 'Dimensions unavailable.'}
             </div>
             <div className="subtext-row">
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href={artData.primaryImage}>
-                Raw Image
-              </a>
+              {artData.primaryImage && (
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={artData.primaryImage}>
+                  Raw Image
+                </a>
+              )}
               <a
                 target="_blank"
                 rel="noopener noreferrer"
@@ -131,7 +132,6 @@ async function getArt(artId) {
     };
     const res = await fetch(`/api/museum/object/${artId}`, req);
     if (!res.ok) {
-      // console.log('Res: ', res);
       if (res.status === 401) {
         throw new Error('Please log in to access this page.');
       }

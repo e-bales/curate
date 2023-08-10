@@ -13,7 +13,6 @@ export default function Department() {
     async function loadDepartments() {
       try {
         const response = await getDepartments();
-        console.log('Departments are: ', response);
         const even = response.departments.filter(
           (element, index) => index % 2 === 0
         );
@@ -22,15 +21,6 @@ export default function Department() {
         );
         setLeftCol(even);
         setRightCol(odd);
-        console.log('User is currently: ');
-        let user = localStorage.getItem('userObj');
-        user = JSON.parse(user);
-        console.dir(user);
-        // console.log(sessionStorage.getItem('userObj').user.userId);
-        // console.log(sessionStorage.getItem('userObj').user.username);
-        // console.log('Evens: ', even)
-        // console.log('Odds: ', odd);
-        // console.log('Departments: ', response);
       } catch (err) {
         setError(err);
       } finally {
@@ -42,7 +32,7 @@ export default function Department() {
   }, []);
 
   if (isLoading) return <LoadingModal />;
-  if (error) return <div>{error.message}</div>;
+  if (error) return <div className="standard-error">{error.message}</div>;
 
   return (
     <div className="department-wrap">
@@ -84,7 +74,6 @@ async function getDepartments() {
     const data = await response.json();
     return data;
   } catch (err) {
-    console.log('Error here!: ', err);
     throw new Error(err);
   }
 }

@@ -13,13 +13,11 @@ export default function Gallery() {
   const [sameUser, setSameUser] = useState(true);
   const [error, setError] = useState();
   const [name, setName] = useState(undefined);
-  // let name;
 
   useEffect(() => {
     async function getGalleryData() {
       try {
         setIsLoading(true);
-        console.log('Requesting gallery data...');
         const id = JSON.parse(localStorage.getItem('userObj'))?.user.userId;
         if (!id) {
           throw new Error(' : Please log in to access this page.');
@@ -35,14 +33,12 @@ export default function Gallery() {
           const data = await fetch(`/api/db/${userId}`);
           const otherJson = await data.json();
           setName(otherJson.username);
-          console.log("Other user's data is: ", data);
         }
         const response = await fetch(`/api/gallery/${userId}`, req);
         if (!response.ok) {
           throw new Error('Could not retrieve gallery data...');
         }
         const json = await response.json();
-        console.log(json);
         setUserArtInfo(json);
         const artData = [];
         for (let i = 0; i < 5; i++) {
@@ -56,7 +52,6 @@ export default function Gallery() {
             artData.push({});
           }
         }
-        console.log('RequestedArt is: ', artData);
         setRequestedArt(artData);
       } catch (err) {
         setError(err);
@@ -101,8 +96,6 @@ export default function Gallery() {
 }
 
 function GalleryDisplay({ userInfo, artInfo, sameUser }) {
-  console.log('ArtInfo is: ', artInfo);
-  console.log('UserInfo is: ', userInfo);
   const artId = artInfo.objectID;
   const description = userInfo?.description;
 

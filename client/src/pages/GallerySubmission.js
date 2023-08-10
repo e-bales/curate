@@ -1,8 +1,7 @@
 import './GallerySubmission.css';
 import LoadingModal from '../components/LoadingModal';
 import { useEffect, useState } from 'react';
-// import Heart from '../components/Heart';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 export default function GallerySubmission({ edit }) {
   const { objectId } = useParams();
@@ -18,15 +17,12 @@ export default function GallerySubmission({ edit }) {
     async function getData() {
       try {
         const favorites = JSON.parse(localStorage.getItem('favorites'));
-        console.log(favorites);
         if (!favorites.includes(Number(objectId))) {
           throw new Error(
             `Object ${objectId} not currently in your favorites, cannot add to your Gallery...`
           );
         }
-        console.log('Requesting to retrieve art piece...');
         const data = await getArt(objectId);
-        console.log('Single art piece retreived as: ', data);
         setArtData(data);
       } catch (err) {
         setError(err);
@@ -77,7 +73,6 @@ export default function GallerySubmission({ edit }) {
       setSubmissionError(false);
       const formData = new FormData(event.target);
       const userData = Object.fromEntries(formData.entries());
-      // console.log(userData['gallery-text']);
       const req = {
         method: 'POST',
         headers: {
@@ -154,17 +149,6 @@ export default function GallerySubmission({ edit }) {
         </div>
         <div className="sg-display-col info-col">
           <div className="sg-information-display belleza-font">
-            {/* <div className="sg-heart-wrap">
-              <Heart
-                artId={artData?.objectID}
-                userId={
-                  JSON.parse(localStorage.getItem('userObj'))?.user.userId
-                }
-                userLiked={JSON.parse(
-                  localStorage.getItem('favorites')
-                ).includes(artData?.objectID)}
-              />
-            </div> */}
             <div className="gallery-submission-wrap">
               <div className="gallery-form-wrap">
                 <form className="gallery-submission" onSubmit={handleSubmit}>
@@ -212,13 +196,6 @@ export default function GallerySubmission({ edit }) {
                   ) : (
                     <ReturnText />
                   )}
-                  {/* <div className='gallery-sub-button-wrap'>
-                    <button
-                      disabled={submissionLoading}
-                      className="gallery-button bebas-font hover-pointer">
-                      {submissionLoading ? 'Loading...' : 'Curate!'}
-                    </button>
-                  </div> */}
                 </form>
               </div>
             </div>
@@ -264,7 +241,6 @@ async function getArt(artId) {
     };
     const res = await fetch(`/api/museum/object/${artId}`, req);
     if (!res.ok) {
-      // console.log('Res: ', res);
       if (res.status === 401) {
         throw new Error('Please log in to access this page.');
       }
