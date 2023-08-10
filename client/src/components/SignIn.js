@@ -9,6 +9,10 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
     return new Promise((resolve) => setTimeout(() => resolve(), msecs));
   }
 
+  /**
+   * Function called when the user submits the Sign In form.
+   * event: the event automatically produced when a form is submitted.
+   */
   async function handleSubmit(event) {
     event.preventDefault();
     try {

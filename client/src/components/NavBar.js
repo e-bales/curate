@@ -3,7 +3,13 @@ import { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { FaPalette, FaBars } from 'react-icons/fa';
 
-export default function NavBar({ loggedIn, logInOnClick, search, logOut }) {
+/**
+ * NavBar Component that persists across the app.
+ * loggedIn: boolean denoting if the user is logged in or not.
+ * logInOnClick: onClick function to open the Sign In modal.
+ * logOut: function to log the user out.
+ */
+export default function NavBar({ loggedIn, logInOnClick, logOut }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const link = [
@@ -16,6 +22,7 @@ export default function NavBar({ loggedIn, logInOnClick, search, logOut }) {
     setDrawerOpen(false);
   }
 
+  // remove all data from localStorage.
   function signOut() {
     localStorage.removeItem('userObj');
     localStorage.removeItem('token');
@@ -62,6 +69,13 @@ export default function NavBar({ loggedIn, logInOnClick, search, logOut }) {
   );
 }
 
+/**
+ * Drawer component that opens when the user clicks the Bars on the left side of the NavBar.
+ * viewed: boolean denoting if the drawer should be open or closed.
+ * loggedIn: boolean denoting if the user has logged in or not.
+ * drawerLinks: array of objects, denoting what links the drawer should display
+ *    link Objects have: name, link, and onClick keys.
+ */
 function Drawer({ viewed, loggedIn, drawerLinks }) {
   return (
     <div className={`drawer ${viewed ? 'shown' : 'hidden'}`}>

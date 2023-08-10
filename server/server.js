@@ -27,7 +27,7 @@ app.use(express.static(uploadsStaticDir));
 app.use(express.json());
 
 /**
- *
+ * General function for querying museum api and returning response.
  * @param {string} url
  * @returns json'ed museum api response
  */

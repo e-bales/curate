@@ -1,7 +1,11 @@
 import './SignUp.css';
 import { useState } from 'react';
 
-export default function SignIn({ subtextOnClick }) {
+/**
+ * SignUp component that allows the user to create an account.
+ * subtextOnClick: function that is called when the user wants to return to the sign in form
+ */
+export default function SignUp({ subtextOnClick }) {
   const [samePW, setSamePW] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -10,6 +14,10 @@ export default function SignIn({ subtextOnClick }) {
     return new Promise((resolve) => setTimeout(() => resolve(), msecs));
   }
 
+  /**
+   * The function for when the Sign Up form is submitted.
+   * event: the event produced when a form is submitted.
+   */
   async function handleSubmit(event) {
     event.preventDefault();
     try {

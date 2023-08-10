@@ -1,12 +1,11 @@
 import './LoadingModal.css';
-// import GrayOut from './GrayOut';
 
+/**
+ * Basic Loading Component, simple text and a spinner.
+ */
 export default function LoadingModal() {
   return (
     <div className="loading-wrap">
-      {/* <div className='grayout-wrap'>
-        <GrayOut />
-      </div> */}
       <div className="modal-wrap">
         <div className="modal">
           <div className="loading-row">
