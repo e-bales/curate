@@ -10,12 +10,14 @@ export default function Profile() {
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [followers, setFollowers] = useState([]);
+  const [followerNames, setFollowerNames] = useState([]);
 
   useEffect(() => {
     async function getFollowers(userId) {
       try {
         const data = await requestFollowers(userId);
         setFollowers(data);
+        setFollowerNames(data.map((element) => element.username));
       } catch (err) {
         setError(err);
       } finally {
@@ -46,7 +48,13 @@ export default function Profile() {
         },
       };
       const result = await getSearchData(req, userId, userData.search);
-      setSearchResults(result);
+      const newArray = [];
+      for (let i = 0; i < result.length; i++) {
+        if (!followerNames.includes(result[i].username)) {
+          newArray.push(result[i]);
+        }
+      }
+      setSearchResults(newArray);
     } catch (err) {
       setSearchError(err);
     } finally {
@@ -54,7 +62,7 @@ export default function Profile() {
     }
   }
 
-  async function unFollowUser(requestedId) {
+  async function unFollowUser(requestedUser) {
     try {
       const userId = JSON.parse(localStorage.getItem('userObj'))?.user.userId;
       const req = {
@@ -63,9 +71,17 @@ export default function Profile() {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       };
-      await fetch(`/api/followers/delete/${userId}/${requestedId}`, req);
+      await fetch(
+        `/api/followers/delete/${userId}/${requestedUser.userId}`,
+        req
+      );
       setFollowers((prev) => {
-        return prev.filter((element) => element.userId !== requestedId);
+        return prev.filter(
+          (element) => element.userId !== requestedUser.userId
+        );
+      });
+      setFollowerNames((prev) => {
+        return prev.filter((element) => element !== requestedUser.username);
       });
     } catch (err) {
       setSearchError(err);
@@ -124,7 +140,7 @@ export default function Profile() {
                 <UserFollower
                   key={index}
                   followedUser={element}
-                  onClick={() => unFollowUser(element.userId)}
+                  onClick={() => unFollowUser(element)}
                 />
               </div>
             ))}
