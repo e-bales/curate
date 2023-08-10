@@ -24,7 +24,7 @@ export default function Profile() {
         setIsLoading(false);
       }
     }
-    const id = JSON.parse(sessionStorage.getItem('userObj')).user.userId;
+    const id = JSON.parse(localStorage.getItem('userObj')).user.userId;
     getFollowers(id);
   }, []);
 
@@ -40,11 +40,11 @@ export default function Profile() {
       if (search.split(' ').length > 1 || search.length < 3) {
         throw new Error(' : Invalid search parameters');
       }
-      const userId = JSON.parse(sessionStorage.getItem('userObj'))?.user.userId;
+      const userId = JSON.parse(localStorage.getItem('userObj'))?.user.userId;
       const req = {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       };
       const result = await getSearchData(req, userId, userData.search);
@@ -59,14 +59,14 @@ export default function Profile() {
 
   async function unFollowUser(requestedId) {
     try {
-      const userId = JSON.parse(sessionStorage.getItem('userObj'))?.user.userId;
+      const userId = JSON.parse(localStorage.getItem('userObj'))?.user.userId;
       console.log(
         `User ${userId} is attempting to unfollow user ${requestedId}`
       );
       const req = {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       };
       const result = await fetch(
@@ -153,7 +153,7 @@ export default function Profile() {
           <div className="profile-button-wrap">
             <Link
               to={`/gallery/${
-                JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+                JSON.parse(localStorage.getItem('userObj'))?.user.userId
               }`}>
               <button
                 className="profile-button bebas-font hover-pointer"
@@ -173,7 +173,7 @@ async function requestFollowers(userId) {
     const req = {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     };
     const res = await fetch(`/api/followers/${userId}`, req);
@@ -235,10 +235,10 @@ function UserResult({ user, setFollowers, followers }) {
       const req = {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       };
-      const currId = JSON.parse(sessionStorage.getItem('userObj'))?.user.userId;
+      const currId = JSON.parse(localStorage.getItem('userObj'))?.user.userId;
       const requestId = user.userId;
       console.log(`User ${currId} is attempting to follow ${requestId}`);
       const res = await fetch(`/api/followers/add/${currId}/${requestId}`, req);

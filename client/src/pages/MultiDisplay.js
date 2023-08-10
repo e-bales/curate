@@ -118,7 +118,7 @@ async function getServerData(id, page) {
     const req = {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     };
     const res = await fetch(`/api/museum/department/${id}/${page}`, req);
@@ -172,11 +172,11 @@ function ArtDisplay({ art }) {
               <Heart
                 artId={art.objectID}
                 userId={
-                  JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+                  JSON.parse(localStorage.getItem('userObj'))?.user.userId
                 }
                 userLiked={
-                  JSON.parse(sessionStorage.getItem('favorites'))
-                    ? JSON.parse(sessionStorage.getItem('favorites')).includes(
+                  JSON.parse(localStorage.getItem('favorites'))
+                    ? JSON.parse(localStorage.getItem('favorites')).includes(
                         art.objectID
                       )
                     : false

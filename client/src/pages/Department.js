@@ -23,7 +23,7 @@ export default function Department() {
         setLeftCol(even);
         setRightCol(odd);
         console.log('User is currently: ');
-        let user = sessionStorage.getItem('userObj');
+        let user = localStorage.getItem('userObj');
         user = JSON.parse(user);
         console.dir(user);
         // console.log(sessionStorage.getItem('userObj').user.userId);

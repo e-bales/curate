@@ -17,11 +17,10 @@ export default function NavBar({ loggedIn, logInOnClick, search, logOut }) {
   }
 
   function signOut() {
-    sessionStorage.removeItem('userObj');
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('favorites');
-    if (sessionStorage.getItem('editData'))
-      sessionStorage.removeItem('editData');
+    localStorage.removeItem('userObj');
+    localStorage.removeItem('token');
+    localStorage.removeItem('favorites');
+    if (localStorage.getItem('editData')) localStorage.removeItem('editData');
     logOut();
     // setUserLoggedIn(false);
     closeDrawer();

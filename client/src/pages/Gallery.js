@@ -20,14 +20,14 @@ export default function Gallery() {
       try {
         setIsLoading(true);
         console.log('Requesting gallery data...');
-        const id = JSON.parse(sessionStorage.getItem('userObj'))?.user.userId;
+        const id = JSON.parse(localStorage.getItem('userObj'))?.user.userId;
         if (!id) {
           throw new Error(' : Please log in to access this page.');
         }
         const req = {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         };
         if (id !== Number(userId)) {
@@ -178,7 +178,7 @@ function EditPencil({ artId, description }) {
   const navigate = useNavigate();
 
   function toEdit() {
-    sessionStorage.setItem('editData', JSON.stringify(description));
+    localStorage.setItem('editData', JSON.stringify(description));
     navigate(`/gallery/submission/${artId}/edit`);
   }
 

@@ -46,7 +46,7 @@ function App() {
   }
 
   useEffect(() => {
-    if (JSON.parse(sessionStorage.getItem('userObj'))?.user !== undefined) {
+    if (JSON.parse(localStorage.getItem('userObj'))?.user !== undefined) {
       setLoggedIn(true);
     }
   }, []);
