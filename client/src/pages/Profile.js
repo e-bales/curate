@@ -18,7 +18,6 @@ export default function Profile() {
         const data = await requestFollowers(userId);
         setFollowers(data);
         setFollowerNames(data.map((element) => element.username));
-        console.log('Followers are: ', data);
       } catch (err) {
         setError(err);
       } finally {
@@ -49,7 +48,6 @@ export default function Profile() {
         },
       };
       const result = await getSearchData(req, userId, userData.search);
-      console.log('follower names are: ', followerNames);
       const newArray = [];
       for (let i = 0; i < result.length; i++) {
         if (!followerNames.includes(result[i].username)) {
@@ -82,8 +80,6 @@ export default function Profile() {
           (element) => element.userId !== requestedUser.userId
         );
       });
-      console.log('requestedUser is: ', requestedUser);
-      console.log('follower names are: ', followerNames);
       setFollowerNames((prev) => {
         return prev.filter((element) => element !== requestedUser.username);
       });
@@ -209,7 +205,6 @@ async function getSearchData(req, userId, search) {
       throw new Error('Could not retrieve users of that search...');
     }
     const data = await res.json();
-    console.log('Data is: ', data);
     return data;
   } catch {
     throw new Error('Could not retrieve search data...');
