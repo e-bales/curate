@@ -5,20 +5,27 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { BsArrowBarLeft, BsArrowBarRight } from 'react-icons/bs';
 
+/**
+ * The page which displays all the art pieces the user has Favorited (paginated on server side).
+ */
 export default function Favorites() {
+  // Used for pagination
   const { pageNum: page } = useParams();
-  // const [page, setPage] = useState(pageNum);
+  // If we need to display the next arrow at the bottom.
   const [moreData, setMoreData] = useState(true);
+  // Contains the information retrieved from the Met API
   const [requestedArt, setRequestedArt] = useState();
+  // If we have hit our limit of 5 for pieces in the Gallery
   const [galleryMax, setGalleryMax] = useState(false);
+  // If we are currently waiting for the API to return data
   const [isLoading, setIsLoading] = useState(true);
+  // If there is an error
   const [error, setError] = useState();
+  // For navigating to other pages.
   const navigate = useNavigate();
 
   useEffect(() => {
-    /**
-     * Gets the server to retrieve the objectId's of 10 of the art pieces
-     */
+    // Function for retrieving the objectId's of 10 of the art pieces
     async function getFirstData() {
       try {
         const id = JSON.parse(localStorage.getItem('userObj'))?.user.userId;
@@ -39,6 +46,8 @@ export default function Favorites() {
     getFirstData();
   }, [page]);
 
+  // Return the loading modal if we have not gotten our API response yet, and
+  // return an error message if there has been an error retrieving data.
   if (isLoading) return <LoadingModal />;
   if (error) {
     if (error.message.split(': ')[1] === 'Please log in to access this page.') {
@@ -92,6 +101,8 @@ export default function Favorites() {
   );
 }
 
+// Function for actually requesting our server to query our database for the user's
+// favorites. Server will also query the Met API for the information for each art piece on the page.
 async function getFavoritesData(id, page) {
   try {
     const req = {
@@ -114,6 +125,11 @@ async function getFavoritesData(id, page) {
   }
 }
 
+/**
+ * The Component for displaying a singular art piece.
+ * art: the art object returned from the Met API
+ * galleryMax: Boolean denoting if we can add more to our Gallery or not.
+ */
 function FavoritesDisplay({ art, galleryMax }) {
   if (art.message === 'Not a valid object') {
     return;
@@ -182,6 +198,14 @@ function FavoritesDisplay({ art, galleryMax }) {
   );
 }
 
+/**
+ * Component displayed at the bottom of the page. Used for navigating forward or
+ * backwards in terms of pagination.
+ * page: integer of the current page.
+ * left: boolean denoting lleft or right arrow being rendered.
+ * moreData: booleaon denoting if there is more data, used for displaying the right arrow or not.
+ * onClick: navigate function to paginate forward or backwards.
+ */
 function FavoritesLink({ page, left, moreData, onClick }) {
   if (left) {
     return (

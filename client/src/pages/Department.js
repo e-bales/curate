@@ -3,16 +3,26 @@ import LoadingModal from '../components/LoadingModal';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+/**
+ * Department page that displays all the departments the API has.
+ * This is the main search functionality of the app, as it is the most
+ * reliable despite also having its flaws.
+ */
 export default function Department() {
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [leftCol, setLeftCol] = useState();
   const [rightCol, setRightCol] = useState();
 
+  /**
+   * When the user first loads the department page, we need to get the data from
+   * the Met API. Only called once, when the first initially renders.
+   */
   useEffect(() => {
     async function loadDepartments() {
       try {
         const response = await getDepartments();
+        // Splits the results in half to display in separate columns.
         const even = response.departments.filter(
           (element, index) => index % 2 === 0
         );
@@ -31,9 +41,12 @@ export default function Department() {
     loadDepartments();
   }, []);
 
+  // Return the loading modal if we have not gotten our API response yet, and
+  // return an error message if there has been an error retrieving data.
   if (isLoading) return <LoadingModal />;
   if (error) return <div className="standard-error">{error.message}</div>;
 
+  // The main returned code. Two columns of DepartmentLink components.
   return (
     <div className="department-wrap">
       <div className="department-row">
@@ -61,6 +74,7 @@ export default function Department() {
   );
 }
 
+// The function that requests the server to call the Met API
 async function getDepartments() {
   try {
     const departmentsUrl =
@@ -78,6 +92,7 @@ async function getDepartments() {
   }
 }
 
+// The individual DeparmentLink component. Each department gets its own link.
 function DepartmentLink({ department }) {
   const name = department.displayName;
   const id = department.departmentId;
