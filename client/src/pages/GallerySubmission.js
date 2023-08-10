@@ -17,7 +17,7 @@ export default function GallerySubmission({ edit }) {
   useEffect(() => {
     async function getData() {
       try {
-        const favorites = JSON.parse(sessionStorage.getItem('favorites'));
+        const favorites = JSON.parse(localStorage.getItem('favorites'));
         console.log(favorites);
         if (!favorites.includes(Number(objectId))) {
           throw new Error(
@@ -44,13 +44,13 @@ export default function GallerySubmission({ edit }) {
       const req = {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
         },
       };
       const response = await fetch(
         `/api/gallery/${
-          JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+          JSON.parse(localStorage.getItem('userObj'))?.user.userId
         }/${artId}`,
         req
       );
@@ -81,14 +81,14 @@ export default function GallerySubmission({ edit }) {
       const req = {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(userData),
       };
       const res = await fetch(
         `/api/gallery/${
-          JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+          JSON.parse(localStorage.getItem('userObj'))?.user.userId
         }/${objectId}`,
         req
       );
@@ -158,10 +158,10 @@ export default function GallerySubmission({ edit }) {
               <Heart
                 artId={artData?.objectID}
                 userId={
-                  JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+                  JSON.parse(localStorage.getItem('userObj'))?.user.userId
                 }
                 userLiked={JSON.parse(
-                  sessionStorage.getItem('favorites')
+                  localStorage.getItem('favorites')
                 ).includes(artData?.objectID)}
               />
             </div> */}
@@ -190,7 +190,7 @@ export default function GallerySubmission({ edit }) {
                       maxLength={400}
                       disabled={removed}
                       placeholder="Add your thoughts...">
-                      {edit && JSON.parse(sessionStorage.getItem('editData'))}
+                      {edit && JSON.parse(localStorage.getItem('editData'))}
                     </textarea>
                     {edit && !removed && (
                       <div
@@ -259,7 +259,7 @@ async function getArt(artId) {
     const req = {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     };
     const res = await fetch(`/api/museum/object/${artId}`, req);
@@ -293,7 +293,7 @@ function ReturnText() {
             onClick={() =>
               navigate(
                 `/gallery/${
-                  JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+                  JSON.parse(localStorage.getItem('userObj'))?.user.userId
                 }`
               )
             }>

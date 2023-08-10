@@ -17,7 +17,7 @@ export default function Heart({ artId, userId, userLiked }) {
       const req = {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       };
       const res = await fetch(`/api/favorites/add/${userId}/${artId}`, req);
@@ -26,9 +26,9 @@ export default function Heart({ artId, userId, userLiked }) {
           `Could not add favorite for user: ${userId} and artId: ${artId}`
         );
       }
-      const array = JSON.parse(sessionStorage.getItem('favorites'));
+      const array = JSON.parse(localStorage.getItem('favorites'));
       const newFavorites = array.concat([artId]);
-      sessionStorage.setItem('favorites', JSON.stringify(newFavorites));
+      localStorage.setItem('favorites', JSON.stringify(newFavorites));
     } catch (err) {
       console.log(err);
       throw new Error(err.message);
@@ -40,7 +40,7 @@ export default function Heart({ artId, userId, userLiked }) {
       const req = {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       };
       const res = await fetch(`/api/favorites/delete/${userId}/${artId}`, req);
@@ -49,12 +49,12 @@ export default function Heart({ artId, userId, userLiked }) {
           `Could not delete favorite for user: ${userId} and artId: ${artId}`
         );
       }
-      const array = JSON.parse(sessionStorage.getItem('favorites'));
+      const array = JSON.parse(localStorage.getItem('favorites'));
       const index = array.indexOf(artId);
       if (index > -1) {
         array.splice(index, 1);
       }
-      sessionStorage.setItem('favorites', JSON.stringify(array));
+      localStorage.setItem('favorites', JSON.stringify(array));
     } catch (err) {
       console.log(err);
       throw new Error(err.message);

@@ -29,13 +29,13 @@ export default function SignIn({ subtextOnClick, onSignIn }) {
       console.log('User is: ', user);
       const favorites = await fetch(`/api/favorites/${user.userId}`);
       const favoritesJSON = await favorites.json();
-      sessionStorage.setItem('favorites', JSON.stringify(favoritesJSON));
+      localStorage.setItem('favorites', JSON.stringify(favoritesJSON));
       // console.log('User is: ', user);
       // console.log('token is: ', token);
       const userObj = { user };
       // console.dir(userObj);
-      sessionStorage.setItem('userObj', JSON.stringify(userObj));
-      sessionStorage.setItem('token', token);
+      localStorage.setItem('userObj', JSON.stringify(userObj));
+      localStorage.setItem('token', token);
       delay(1500);
       onSignIn();
     } catch (err) {

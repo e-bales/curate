@@ -82,10 +82,10 @@ export default function SingleDisplay() {
               <Heart
                 artId={artData?.objectID}
                 userId={
-                  JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+                  JSON.parse(localStorage.getItem('userObj'))?.user.userId
                 }
                 userLiked={JSON.parse(
-                  sessionStorage.getItem('favorites')
+                  localStorage.getItem('favorites')
                 ).includes(artData?.objectID)}
               />
             </div>
@@ -126,7 +126,7 @@ async function getArt(artId) {
     const req = {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     };
     const res = await fetch(`/api/museum/object/${artId}`, req);

@@ -22,7 +22,7 @@ export default function Favorites() {
     async function getFirstData() {
       try {
         console.log('Requesting to retrieve first 10 favorites...');
-        const id = JSON.parse(sessionStorage.getItem('userObj'))?.user.userId;
+        const id = JSON.parse(localStorage.getItem('userObj'))?.user.userId;
         if (!id) {
           throw new Error(' : Please log in to access this page.');
         }
@@ -116,7 +116,7 @@ async function getFavoritesData(id, page) {
     const req = {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     };
     const res = await fetch(`/api/favorites/${id}/${page}`, req);
@@ -169,11 +169,11 @@ function FavoritesDisplay({ art, galleryMax }) {
               <Heart
                 artId={art.objectID}
                 userId={
-                  JSON.parse(sessionStorage.getItem('userObj'))?.user.userId
+                  JSON.parse(localStorage.getItem('userObj'))?.user.userId
                 }
                 userLiked={
-                  JSON.parse(sessionStorage.getItem('favorites'))
-                    ? JSON.parse(sessionStorage.getItem('favorites')).includes(
+                  JSON.parse(localStorage.getItem('favorites'))
+                    ? JSON.parse(localStorage.getItem('favorites')).includes(
                         art.objectID
                       )
                     : false

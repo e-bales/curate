@@ -92,10 +92,10 @@ function SplashArt({ artObj, loggedIn }) {
           {' '}
           <Heart
             artId={artObj.id}
-            userId={JSON.parse(sessionStorage.getItem('userObj'))?.user.userId}
+            userId={JSON.parse(localStorage.getItem('userObj'))?.user.userId}
             userLiked={
-              JSON.parse(sessionStorage.getItem('favorites'))
-                ? JSON.parse(sessionStorage.getItem('favorites')).includes(
+              JSON.parse(localStorage.getItem('favorites'))
+                ? JSON.parse(localStorage.getItem('favorites')).includes(
                     artObj.id
                   )
                 : false
