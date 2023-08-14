@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import art from './san-giorgio-maggiore-at-dusk.jpg';
-import art2 from './christ-with-angels.jpg';
-import artLarge from './Large-Test-img.jpg';
 import NavBar from './components/NavBar';
 import SplashPage from './pages/SplashPage';
 import Profile from './pages/Profile';
@@ -17,12 +14,16 @@ import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import './App.css';
 
-const images = [art, art2, artLarge];
-
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [loggingIn, setLoggingIn] = useState('');
   const [grayOut, setGrayOut] = useState(false);
+
+  useEffect(() => {
+    if (JSON.parse(localStorage.getItem('userObj'))?.user !== undefined) {
+      setLoggedIn(true);
+    }
+  }, []);
 
   function closeModal() {
     setGrayOut(false);
@@ -43,12 +44,6 @@ function App() {
   function signOut() {
     setLoggedIn(false);
   }
-
-  useEffect(() => {
-    if (JSON.parse(localStorage.getItem('userObj'))?.user !== undefined) {
-      setLoggedIn(true);
-    }
-  }, []);
 
   return (
     <div className="app">
@@ -75,10 +70,7 @@ function App() {
               loggedIn={loggedIn}
             />
           }>
-          <Route
-            index
-            element={<SplashPage loggedIn={loggedIn} imageSet={images} />}
-          />
+          <Route index element={<SplashPage loggedIn={loggedIn} />} />
           <Route path="profile" element={<Profile />} />
           <Route path="favorites/:pageNum" element={<Favorites />} />
           <Route
