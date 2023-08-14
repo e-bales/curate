@@ -5,7 +5,7 @@
 .sign-in {
   position: absolute;
   z-index: 2;
-  width: 30rem;
+  width: 24rem;
   height: auto;
   background-color: #f9f9f9;
   border-radius: 1rem;
@@ -36,9 +36,7 @@
 }
 
 .login-col-full {
-  /* display: flex;
-  flex-direction: column;
-  width: 100%; */
+  /* display: flex; */
 }
 
 .form-input {
@@ -100,4 +98,10 @@
 
 .invisible {
   display: none;
+}
+
+@media (1200px <= width) {
+  .sign-in {
+    width: 30rem;
+  }
 }

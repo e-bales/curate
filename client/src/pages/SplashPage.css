@@ -2,11 +2,14 @@
   width: 80%;
   margin: auto;
   padding-top: 3rem;
+  display: flex;
+  justify-content: center;
 }
 
 .row {
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .col-full {
@@ -31,8 +34,8 @@
   position: relative;
   display: flex;
   justify-content: center;
-  height: 30rem;
-  width: 50rem;
+  height: 10rem;
+  width: 20rem;
 }
 
 img {
@@ -59,7 +62,7 @@ img {
 }
 
 .splash-image {
-  max-width: 45rem;
+  max-width: 13rem;
 }
 
 .splash-heart {
@@ -72,3 +75,25 @@ img {
   top: 3rem;
   right: 3rem;
 }
+
+@media (767px <= width) {
+  .img-wrap {
+    height: 20rem;
+    width: 42rem;
+  }
+
+  .splash-image {
+    max-width: 35rem;
+  }
+}
+
+/* @media (width: >= 1200px) {
+  .img-wrap {
+      height: 20rem;
+      width: 42rem;
+    }
+
+    .splash-image {
+      max-width: 45rem;
+    }
+} */

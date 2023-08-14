@@ -1,6 +1,9 @@
 .gallery-title-wrap {
   color: #8f7682;
   display: flex;
+  width: 80%;
+  text-align: center;
+  margin: auto;
   justify-content: center;
   padding-top: 2rem;
   font-size: 2.25rem;
@@ -8,13 +11,14 @@
 
 .gallery-content-wrap {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   justify-content: center;
 }
 
 .gd-wrap {
   display: flex;
-  width: 30%;
+  width: 80%;
+  margin: auto;
   justify-content: center;
   padding-top: 1rem;
 }
@@ -32,8 +36,6 @@
 }
 
 .gd-image {
-  border-left: 2px solid #ebebeb;
-  border-right: 2px solid #ebebeb;
   padding: 0.5rem 2.5rem;
 }
 
@@ -61,7 +63,7 @@
 }
 
 .gd-description {
-  width: 22rem;
+  width: 18rem;
   text-align: center;
   padding-bottom: 2.5rem;
 }
@@ -69,9 +71,6 @@
 .gd-art-title {
   color: #394855;
   margin-bottom: 0;
-
-  /* display: flex;
-  align-items: center; */
 }
 
 .gd-art-artist {
@@ -83,10 +82,35 @@
 .edit-pencil-wrap {
   position: absolute;
   top: 0.5rem;
-  right: 1rem;
+  right: 1.75rem;
 }
 
 .edit-pencil {
   font-size: 0.75rem;
   color: #9ba3a9;
+}
+
+@media (1200px <= width) {
+  .gallery-content-wrap {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .gd-wrap {
+    width: 30%;
+    margin: inherit;
+  }
+
+  .gd-image {
+    border-left: 2px solid #ebebeb;
+    border-right: 2px solid #ebebeb;
+  }
+
+  .edit-pencil-wrap {
+    right: 1rem;
+  }
+
+  .gd-description {
+    width: 22rem;
+  }
 }
