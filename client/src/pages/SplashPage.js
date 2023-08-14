@@ -11,7 +11,7 @@ import holderImage from '../default-product-img.jpg';
 export default function SplashPage({ loggedIn, imageSet }) {
   const [index, setIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState();
   const [randomImages, setRandomImages] = useState();
 
   useEffect(() => {

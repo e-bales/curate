@@ -1,19 +1,17 @@
 .sg-art-display {
   display: flex;
   justify-content: center;
-  height: 30rem;
-  width: 50rem;
+  height: 18rem;
 }
 
 .sg-img-wrap {
   display: flex;
   justify-content: center;
-  height: 30rem;
-  width: 50rem;
+  height: 18rem;
 }
 
 .sg-art {
-  max-width: 40rem;
+  max-width: 18rem;
 }
 
 .sg-display-wrap {
@@ -24,13 +22,14 @@
 
 .sg-display-row {
   display: flex;
+  flex-direction: column;
   width: 100%;
 }
 
 .sg-display-col {
   display: flex;
   justify-content: center;
-  width: 50%;
+  width: 100%;
 }
 
 .column {
@@ -49,8 +48,8 @@
 
 .sg-heart-wrap {
   position: absolute;
-  top: 3rem;
-  left: -2rem;
+  left: -2em;
+  bottom: 0;
 }
 
 .sg-title {
@@ -66,8 +65,6 @@
 .sg-artist-info {
   color: #9ba3a9;
   padding-bottom: 1rem;
-
-  /* padding-top: -1rem; */
 }
 
 .sg-artist-info h3 {
@@ -87,8 +84,9 @@
 .info-col {
   border-left: 2px solid #9ba3a9;
   justify-content: left;
-  margin-left: 5rem;
-  padding-left: 4rem;
+  padding-left: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 .art-subtext {
@@ -109,4 +107,40 @@
   padding-bottom: 0.5rem;
   max-width: 20rem;
   text-align: center;
+}
+
+@media (1200px <= width) {
+  .sg-display-row {
+    flex-direction: row;
+  }
+
+  .sg-display-col {
+    width: 50%;
+  }
+
+  .info-col {
+    margin-left: 5rem;
+    padding-left: 4rem;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .sg-img-wrap {
+    height: 30rem;
+    width: 50rem;
+  }
+
+  .sg-art-display {
+    height: 30rem;
+    width: 50rem;
+  }
+
+  .sg-heart-wrap {
+    top: 3rem;
+    left: -2rem;
+  }
+
+  .sg-art {
+    max-width: 40rem;
+  }
 }

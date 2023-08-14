@@ -22,6 +22,7 @@
 
 .col-half {
   display: flex;
+  align-items: center;
   width: 50%;
 }
 
@@ -30,26 +31,28 @@
 }
 
 .palette {
-  font-size: 2.5rem;
+  font-size: 20px;
+  padding-right: 0.25rem;
+  margin-bottom: 0.2rem;
 }
 
 .title-text {
   margin: 0;
-  font-size: 2.5rem;
-  padding-left: 1rem;
+  font-size: 1.5rem;
+  padding-left: 0;
   color: #f9f9f9;
   text-decoration: none;
 }
 
 .small-text {
-  font-size: 1.5rem;
+  font-size: 1rem;
 }
 
 .bars {
   position: absolute;
   top: 1.5rem;
   left: 1rem;
-  font-size: 2rem;
+  font-size: 1.25rem;
 }
 
 .drawer {
@@ -96,4 +99,22 @@
 
 .hover-pointer:hover {
   cursor: pointer;
+}
+
+@media (767px <= width) {
+  .title-text {
+    font-size: 2.5rem;
+  }
+
+  .small-text {
+    font-size: 2rem;
+  }
+
+  .bars {
+    font-size: 2rem;
+  }
+
+  .palette {
+    font-size: 30px;
+  }
 }
