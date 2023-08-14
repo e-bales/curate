@@ -8,7 +8,7 @@ import {
 } from 'react-icons/bs';
 import holderImage from '../default-product-img.jpg';
 
-export default function SplashPage({ loggedIn, imageSet }) {
+export default function SplashPage({ loggedIn }) {
   const [index, setIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
