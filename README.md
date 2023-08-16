@@ -11,6 +11,11 @@ To explore my web app, visit: https://curate.elibales.dev/
 Feel free to use the <ins>Guest Account</ins> option when signing in to play around!
 
 # Previews
+![curate-explore-and-favorite](https://github.com/e-bales/curate/assets/132625085/0213503e-7523-4fca-bf6a-cf602d3b0b02)
+
+![curate-gallery-and-follow](https://github.com/e-bales/curate/assets/132625085/1dbeb0e3-1362-4735-9ee9-03e754c6925d)
+
+
 
 # Technologies Used
 
