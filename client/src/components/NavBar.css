@@ -48,11 +48,19 @@
   font-size: 1rem;
 }
 
+.small-text:active {
+  transform: translateY(4px);
+}
+
 .bars {
   position: absolute;
   top: 1.5rem;
   left: 1rem;
   font-size: 1.25rem;
+}
+
+.bars:active {
+  transform: translateY(4px);
 }
 
 .drawer {
@@ -83,6 +91,10 @@
 
 .link:hover {
   font-weight: bold;
+}
+
+.link:active {
+  transform: translateY(4px);
 }
 
 .close:hover {

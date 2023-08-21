@@ -5,3 +5,7 @@
 .liked {
   color: red;
 }
+
+.heart:active {
+  transform: translateY(2px);
+}

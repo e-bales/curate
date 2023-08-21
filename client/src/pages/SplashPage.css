@@ -30,6 +30,10 @@
   cursor: pointer;
 }
 
+.arrow:active {
+  transform: translateY(4px);
+}
+
 .img-wrap {
   position: relative;
   display: flex;
@@ -78,12 +82,12 @@ img {
 
 @media (767px <= width) {
   .img-wrap {
-    height: 20rem;
-    width: 42rem;
+    height: 30rem;
+    width: 50rem;
   }
 
   .splash-image {
-    max-width: 35rem;
+    max-width: 45rem;
   }
 }
 

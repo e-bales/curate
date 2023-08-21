@@ -96,7 +96,7 @@ function Drawer({ viewed, loggedIn, drawerLinks }) {
             <p>Sign In and become your own Curator to continue!</p>
           )}
         </div>
-        <div className="close">
+        <div className="close link">
           <p className="hover-pointer" onClick={() => drawerLinks[0].onClick()}>
             Close
           </p>
