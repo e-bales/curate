@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Heart from '../components/Heart';
 import { useParams } from 'react-router-dom';
 import holderImage from '../default-product-img.jpg';
+import CopyrightCircle from '../components/CopyrightCircle';
 
 export default function SingleDisplay() {
   const { objectId } = useParams();
@@ -51,6 +52,7 @@ export default function SingleDisplay() {
                 src={artData.primaryImage ? artData.primaryImage : holderImage}
                 alt={artData.title}
               />
+              {!artData.primaryImage && <CopyrightCircle />}
             </div>
           </div>
           <div className="art-subtext belleza-font">

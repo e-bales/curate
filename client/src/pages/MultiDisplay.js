@@ -1,6 +1,7 @@
 import './MultiDisplay.css';
 import LoadingModal from '../components/LoadingModal';
 import Heart from '../components/Heart';
+import CopyrightCircle from '../components/CopyrightCircle';
 import { departments } from '../department';
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
@@ -130,6 +131,7 @@ function ArtDisplay({ art }) {
               />
             </div>
           </Link>
+          {!art.primaryImageSmall && <CopyrightCircle />}
         </div>
         <div className="information-column">
           <div className="information-row">
